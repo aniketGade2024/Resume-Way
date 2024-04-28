@@ -1,4 +1,6 @@
-import "./styles.css";
+import { Box, Typography } from "@mui/material";
+import CardStyles from "./styles";
+import theme from "@/utils/theme/theme";
 
 type ICard = {
     title: string;
@@ -6,12 +8,16 @@ type ICard = {
 }
 
 const AppCard = ({ title, subTitle }: ICard) => {
-    <div className="card">
-        <div className="card-content">
-            <h2 className="card-title">{title}</h2>
-            <p className="card-subtitle">{subTitle}</p>
-        </div>
-    </div>
+    const styles = CardStyles(theme);
+
+    return (
+        <Box sx={styles.card}>
+            <Box sx={styles.cardContent}>
+                <Typography variant="h2" sx={styles.cardTitle}>{title}</Typography>
+                <Typography sx={styles.cardSubtitle}>{subTitle}</Typography>
+            </Box>
+        </Box>
+    )
 
 }
 

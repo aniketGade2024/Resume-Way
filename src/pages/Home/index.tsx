@@ -1,18 +1,25 @@
 import { AppButton, FileUploader } from "@/components/atoms";
-import "./styles.css";
+import { Box, Typography } from "@mui/material";
+import HomePageStyles from "./styles";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
+    const styles = HomePageStyles();
+    const navigate = useNavigate();
+
     return (
-        <div className="card">
-            <div className="dFlex">
+        <Box sx={styles.card}>
+            <Box sx={styles.dFlex}>
                 <FileUploader title="Upload Resume" />
                 <FileUploader title="Upload JD (Job Description)" />
-            </div>
-                <p id="score">Accepted Resume Score : <span className="span">50%</span></p>
-                <div className="justifyEnd">
-                    <AppButton text="Process"/>
-                </div>
-        </div>
+            </Box>
+            <Typography sx={styles.score}>Accepted Resume Score : <Typography component={"span"} sx={styles.span}>50%</Typography></Typography>
+            <Box sx={styles.justifyEnd}>
+                <AppButton text="Process" onClick={() => {
+                    navigate({ pathname: '/user' })
+                }} />
+            </Box>
+        </Box>
     )
 }
 export default Home;

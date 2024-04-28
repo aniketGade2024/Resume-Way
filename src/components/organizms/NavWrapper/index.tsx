@@ -1,4 +1,5 @@
 import { NavBar } from "@/components/molecules";
+import { Box } from "@mui/material";
 
 type INavWrapper = {
     children: React.ReactNode;
@@ -6,10 +7,10 @@ type INavWrapper = {
 
 const NavWrapper = ({ children }: INavWrapper) => {
     return (
-        <div>
+        <Box>
             <NavBar />
             {children}
-        </div>
+        </Box>
 
     )
 }

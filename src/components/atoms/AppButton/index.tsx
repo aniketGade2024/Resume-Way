@@ -1,14 +1,18 @@
-import "./styles.css";
+import { Button, SxProps } from "@mui/material";
+import ButtonStyles from "./styles";
+import theme from "@/utils/theme/theme";
 
 type IAppButton = {
     text: string;
     onClick?: () => void;
-    style?: React.CSSProperties;
+    sx?: SxProps;
 }
 
-const AppButton = ({ text, onClick, style }: IAppButton) => {
+const AppButton = ({ text, onClick, sx }: IAppButton) => {
+    const styles = ButtonStyles(theme);
+
     return (
-        <button className="button-9" role="button" onClick={onClick} style={{ ...style }}>{text}</button>
+        <Button sx={{ ...styles.button, ...sx } as any} onClick={onClick}>{text}</Button>
     )
 }
 

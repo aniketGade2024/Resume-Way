@@ -1,10 +1,10 @@
+import AppRouter from "./AppRouter"
 import { NavWrapper } from "./components/organizms"
-import Home from "./pages/Home"
 
 const App = () => {
   return (
     <NavWrapper>
-      <Home/>
+      <AppRouter/>
     </NavWrapper>
   )
 }
