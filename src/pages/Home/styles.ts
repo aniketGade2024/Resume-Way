@@ -24,9 +24,20 @@ const HomePageStyles = () => ({
     justifyEnd: {
         display: "flex",
         justifyContent: "flex-end",
-        paddingRight: "30px",
     },
 
+    flex1: {
+        flex: 1,
+        margin: "20px 40px",
+    },
+
+    justifyCenter: {
+        display: "flex",
+        justifyContent: "center"
+    },
+    processBtn:{
+        marginTop:"5%"
+    }
 })
 
 export default HomePageStyles;

@@ -1,4 +1,4 @@
-import IStyle from "@/utils/types/common";
+import IStyle from "@/types/common";
 import { Theme } from "@mui/material";
 
 const CardStyles = (theme:Theme) => ({

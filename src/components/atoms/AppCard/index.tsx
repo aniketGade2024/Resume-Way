@@ -1,6 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import CardStyles from "./styles";
-import theme from "@/utils/theme/theme";
+import theme from "@/theme/theme";
 
 type ICard = {
     title: string;

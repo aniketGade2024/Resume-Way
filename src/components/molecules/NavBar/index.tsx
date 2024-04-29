@@ -2,7 +2,7 @@ import { Box } from "@mui/material";
 import AnimatedPlane from "@/assets/AnimationPlane.gif";
 import NavBarStyles from "./styles";
 import React from "react";
-import theme from "@/utils/theme/theme";
+import theme from "@/theme/theme";
 
 const NavBar = () => {
 

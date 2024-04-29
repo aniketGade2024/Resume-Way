@@ -4,7 +4,7 @@ import App from "./App";
 import './index.css'
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material';
-import theme from './utils/theme/theme';
+import theme from './theme/theme';
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
