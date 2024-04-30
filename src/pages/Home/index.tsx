@@ -1,13 +1,138 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { AppButton, FileUploader } from "@/components/atoms";
 import { Box, Typography } from "@mui/material";
 import HomePageStyles from "./styles";
-import { useNavigate } from "react-router-dom";
 import { FormProvider, useForm } from "react-hook-form";
+import React from "react";
+import { useMutation } from "@tanstack/react-query";
+import Recognize from "@/services/recognize";
+import { IRecognizePayload } from "@/types/recognize";
+import { boolean, z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod"
+import { IAnalyzePayload } from "@/types/analyze";
+import Analyze from "@/services/analyze";
+import { ExtractResumeJson } from "@/services/extractJson";
+import { IExtractJsonPayload } from "@/types/extractJson";
+
+type IAnalyze = {
+    resume?: string;
+    job_description?: string;
+}
 
 const Home = () => {
     const styles = HomePageStyles();
-    const navigate = useNavigate();
-    const methods = useForm();
+    const [convertedJson, setConvertedJson] = React.useState<IAnalyze>({
+        resume: '',
+        job_description: ''
+    })
+
+    const FileUploaderSchema = z.object({
+        resume: z.string().min(1, 'Resume File is Required'),
+        jd: z.string().min(1, 'jd file is required')
+    })
+    type IValidation = z.infer<typeof FileUploaderSchema>;
+
+    const methods = useForm<IValidation>({
+        resolver: zodResolver(FileUploaderSchema),
+        defaultValues: {
+            resume: '',
+            jd: ''
+        }
+    });
+
+    const { watch } = methods;
+
+    //  Recognize Mutation 
+    const RecognizeMutation = useMutation({
+        mutationKey: ['RecognizeMutation'],
+        mutationFn: (payload: IRecognizePayload) => Recognize(payload),
+        onSuccess: (data) => {
+            if (data?.data?.text) {
+                setConvertedJson({
+                    resume: data.data.text
+                })
+            }
+        },
+        onError: () => {
+            console.log("Error");
+        }
+    })
+
+    // Extract Resume JSON
+    const ExtractResumeJsonMutation = useMutation({
+        mutationKey: ['ExtractResumeJsonMutation'],
+        mutationFn: (payload: IExtractJsonPayload) => ExtractResumeJson(payload),
+        onSuccess: (data) => {
+            console.log(data);
+        },
+        onError: () => {
+            console.log("Error");
+        }
+    })
+
+    // Extract JD JSON
+    const ExtractJDJsonMutation = useMutation({
+        mutationKey: ['ExtractResumeJsonMutation'],
+        mutationFn: (payload: IExtractJsonPayload) => ExtractResumeJson(payload),
+        onSuccess: (data) => {
+            console.log(data);
+        },
+        onError: () => {
+            console.log("Error");
+        }
+    })
+
+    // Analyze API mutation
+    const AnalyzeMutation = useMutation({
+        mutationKey: ['AnalyzeMutation'],
+        mutationFn: (payload: IAnalyzePayload) => Analyze(payload),
+        onSuccess: (data) => {
+            console.log(data);
+        },
+        onError: () => {
+            console.log("Error");
+        }
+
+    })
+
+    //  Call RECOGNIZE API
+    const callRecognizeAPI = async (imageBase64: string) => {
+        const payload: IRecognizePayload = {
+            imageBase64
+        }
+        await RecognizeMutation.mutateAsync(payload);
+    }
+
+    // Call Extract JSON API 
+    const callExtractJSON = async (name: string, text: string) => {
+        if (name === "resume") {
+            await ExtractResumeJsonMutation.mutateAsync({ prompt: text });
+        }
+        else if (name === "jd") {
+            await ExtractJDJsonMutation.mutateAsync({ prompt: text });
+        }
+    }
+
+    // Call Analyze API
+    const callAnalyzeAPI = async () => {
+        const payload: IAnalyzePayload = {
+            resume: convertedJson.resume as string,
+            job_description: convertedJson.job_description as string
+        }
+        await AnalyzeMutation.mutateAsync(payload)
+    }
+
+    React.useEffect(() => {
+        if (watch('resume')) {
+            callRecognizeAPI(watch('resume'));
+        }
+    }, [watch('resume')]);
+
+    React.useEffect(() => {
+        if (watch('jd')) {
+            callRecognizeAPI(watch('jd'))
+        }
+    }, [watch('jd')])
 
     return (
         <Box sx={styles.card}>
@@ -15,22 +140,20 @@ const Home = () => {
                 <FormProvider {...methods}>
                     <Box sx={styles.flex1}>
                         <FileUploader name="resume" title="Upload Resume" />
-                        <AppButton text="Analyze" />
+                        <AppButton disabled={Boolean(convertedJson.resume === '')} text="Extract JSON" onClick={() => callExtractJSON('resume', convertedJson.resume ?? '')} />
 
                     </Box>
                     <Box sx={styles.flex1}>
                         <FileUploader name="jd" title="Upload JD (Job Description)" />
                         <Box sx={styles.justifyEnd}>
-                            <AppButton text="Analyze" />
+                            <AppButton disabled={Boolean(convertedJson.job_description === '')} text="Extract JSON" />
                         </Box>
                     </Box>
                 </FormProvider>
             </Box>
             <Typography sx={styles.score}>Accepted Resume Score : <Typography component={"span"} sx={styles.span}>50%</Typography></Typography>
             <Box sx={styles.justifyCenter}>
-                <AppButton text="Process" onClick={() => {
-                    navigate({ pathname: '/user' })
-                }} sx={styles.processBtn} />
+                <AppButton text="Process" onClick={() => callAnalyzeAPI()} sx={styles.processBtn} />
             </Box>
         </Box>
     )

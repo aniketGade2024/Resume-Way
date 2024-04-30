@@ -19,12 +19,14 @@ const ButtonStyles = (theme: Theme) => ({
         userSelect: "none",
         "&:disabled": {
             cursor: "default",
+            backgroundColor:"grey"
         },
         textTransform: "none",
         "&:hover": {
             backgroundColor: theme.palette.primary.main,
             color: theme.palette.info.main,
-        }
+        },
+        
     },
     loader: {
         marginLeft: "10px"

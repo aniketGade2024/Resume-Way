@@ -7,14 +7,15 @@ type IAppButton = {
     onClick?: () => void;
     sx?: SxProps;
     isLoading?: boolean;
+    disabled?: boolean;
     [x: string]: any;
 }
 
-const AppButton = ({ text, onClick, isLoading, sx, ...rest }: IAppButton) => {
+const AppButton = ({ text, onClick, isLoading, disabled, sx, ...rest }: IAppButton) => {
     const styles = ButtonStyles(theme);
 
     return (
-        <Button sx={{ ...styles.button, ...sx } as any} onClick={onClick} {...rest}>{text}{isLoading && <CircularProgress sx={styles.loader} color="info" size={25} />}</Button>
+        <Button disabled={disabled} sx={{ ...styles.button, ...sx } as any} onClick={onClick} {...rest}>{text}{isLoading && <CircularProgress sx={styles.loader} color="info" size={25} />}</Button>
     )
 }
 

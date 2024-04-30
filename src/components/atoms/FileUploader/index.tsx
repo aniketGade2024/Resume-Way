@@ -19,9 +19,10 @@ const FiledUploader = ({ name, title }: IFileUploader) => {
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const selectedFile = e.target.files[0];
+      console.log(selectedFile);
       const base64File = await convertToBase64(selectedFile);
       if (base64File) {
-        setValue(name, base64File as any);
+        setValue(name, String(base64File).split(",")[1]);
       }
       setFile(URL.createObjectURL(selectedFile) as any);
     }
