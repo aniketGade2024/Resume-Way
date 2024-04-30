@@ -7,11 +7,11 @@ import React from "react";
 import { useMutation } from "@tanstack/react-query";
 import Recognize from "@/services/recognize";
 import { IRecognizePayload } from "@/types/recognize";
-import { boolean, z } from "zod";
+import {  z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { IAnalyzePayload } from "@/types/analyze";
 import Analyze from "@/services/analyze";
-import { ExtractResumeJson } from "@/services/extractJson";
+import { ExtractJDJson, ExtractResumeJson } from "@/services/extractJson";
 import { IExtractJsonPayload } from "@/types/extractJson";
 
 type IAnalyze = {
@@ -47,11 +47,7 @@ const Home = () => {
         mutationKey: ['RecognizeMutation'],
         mutationFn: (payload: IRecognizePayload) => Recognize(payload),
         onSuccess: (data) => {
-            if (data?.data?.text) {
-                setConvertedJson({
-                    resume: data.data.text
-                })
-            }
+
         },
         onError: () => {
             console.log("Error");
@@ -63,7 +59,9 @@ const Home = () => {
         mutationKey: ['ExtractResumeJsonMutation'],
         mutationFn: (payload: IExtractJsonPayload) => ExtractResumeJson(payload),
         onSuccess: (data) => {
-            console.log(data);
+            setConvertedJson({
+                resume: JSON.stringify((data as any)?.output)
+            })
         },
         onError: () => {
             console.log("Error");
@@ -73,9 +71,11 @@ const Home = () => {
     // Extract JD JSON
     const ExtractJDJsonMutation = useMutation({
         mutationKey: ['ExtractResumeJsonMutation'],
-        mutationFn: (payload: IExtractJsonPayload) => ExtractResumeJson(payload),
+        mutationFn: (payload: IExtractJsonPayload) => ExtractJDJson(payload),
         onSuccess: (data) => {
-            console.log(data);
+            setConvertedJson({
+                job_description: JSON.stringify((data as any)?.output)
+            })
         },
         onError: () => {
             console.log("Error");
@@ -96,11 +96,20 @@ const Home = () => {
     })
 
     //  Call RECOGNIZE API
-    const callRecognizeAPI = async (imageBase64: string) => {
+    const callRecognizeAPI = async (name: "resume" | "jd", imageBase64: string) => {
         const payload: IRecognizePayload = {
             imageBase64
         }
-        await RecognizeMutation.mutateAsync(payload);
+        const response = await RecognizeMutation.mutateAsync(payload);
+        if (response?.data?.text && name === "resume") {
+            setConvertedJson({
+                resume: response.data.text,
+            })
+        } else if (name === "jd" && response?.data?.text) {
+            setConvertedJson({
+                job_description: response.data.text
+            })
+        }
     }
 
     // Call Extract JSON API 
@@ -124,13 +133,13 @@ const Home = () => {
 
     React.useEffect(() => {
         if (watch('resume')) {
-            callRecognizeAPI(watch('resume'));
+            callRecognizeAPI("resume", watch('resume'));
         }
     }, [watch('resume')]);
 
     React.useEffect(() => {
         if (watch('jd')) {
-            callRecognizeAPI(watch('jd'))
+            callRecognizeAPI("jd", watch('jd'))
         }
     }, [watch('jd')])
 
@@ -146,7 +155,7 @@ const Home = () => {
                     <Box sx={styles.flex1}>
                         <FileUploader name="jd" title="Upload JD (Job Description)" />
                         <Box sx={styles.justifyEnd}>
-                            <AppButton disabled={Boolean(convertedJson.job_description === '')} text="Extract JSON" />
+                            <AppButton disabled={Boolean(convertedJson.job_description === '')} text="Extract JSON" onClick={() => callExtractJSON('jd', convertedJson.job_description ?? '')} />
                         </Box>
                     </Box>
                 </FormProvider>

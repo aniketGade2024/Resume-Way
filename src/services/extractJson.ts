@@ -7,8 +7,7 @@ const ExtractResumeJson = async (payload: IExtractJsonPayload) => {
     try {
         const response = await apiInstance.post(apiURLs.extractResumeJson, payload);
         const processedResponse = await response.data;
-        console.log(processedResponse);
-        // return RecognizeResponseSchema.parse(processedResponse)
+        return processedResponse;
     } catch { }
 
 }
@@ -18,8 +17,7 @@ const ExtractJDJson = async (payload: IExtractJsonPayload) => {
     try {
         const response = await apiInstance.post(apiURLs.extractJdJson, payload);
         const processedResponse = await response.data;
-        console.log(processedResponse);
-        // return RecognizeResponseSchema.parse(processedResponse)
+        return processedResponse;
     } catch { }
 
 }
