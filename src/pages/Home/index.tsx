@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { AppButton, FileUploader } from "@/components/atoms";
+import { AppButton, AppLoader, FileUploader } from "@/components/atoms";
 import { Box, Typography } from "@mui/material";
 import HomePageStyles from "./styles";
 import { FormProvider, useForm } from "react-hook-form";
@@ -7,12 +7,15 @@ import React from "react";
 import { useMutation } from "@tanstack/react-query";
 import Recognize from "@/services/recognize";
 import { IRecognizePayload } from "@/types/recognize";
-import {  z } from "zod";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { IAnalyzePayload } from "@/types/analyze";
 import Analyze from "@/services/analyze";
 import { ExtractJDJson, ExtractResumeJson } from "@/services/extractJson";
 import { IExtractJsonPayload } from "@/types/extractJson";
+import { useLoader } from "@/hooks";
+import useAppStore from "@/store";
+import { useNavigate } from "react-router-dom";
 
 type IAnalyze = {
     resume?: string;
@@ -20,11 +23,20 @@ type IAnalyze = {
 }
 
 const Home = () => {
-    const styles = HomePageStyles();
     const [convertedJson, setConvertedJson] = React.useState<IAnalyze>({
         resume: '',
         job_description: ''
     })
+
+    const [prompt, setPrompt] = React.useState<IAnalyze>({
+        resume: '',
+        job_description: ''
+    })
+
+    const styles = HomePageStyles();
+    const { loader, showLoader, hideLoader } = useLoader();
+    const {  setResumeInfo } = useAppStore();
+    const navigate = useNavigate();
 
     const FileUploaderSchema = z.object({
         resume: z.string().min(1, 'Resume File is Required'),
@@ -46,8 +58,8 @@ const Home = () => {
     const RecognizeMutation = useMutation({
         mutationKey: ['RecognizeMutation'],
         mutationFn: (payload: IRecognizePayload) => Recognize(payload),
-        onSuccess: (data) => {
-
+        onSuccess: () => {
+            hideLoader();
         },
         onError: () => {
             console.log("Error");
@@ -59,11 +71,13 @@ const Home = () => {
         mutationKey: ['ExtractResumeJsonMutation'],
         mutationFn: (payload: IExtractJsonPayload) => ExtractResumeJson(payload),
         onSuccess: (data) => {
+            hideLoader();
             setConvertedJson({
-                resume: JSON.stringify((data as any)?.output)
+                ...convertedJson, resume: JSON.stringify((data as any)?.output)
             })
         },
         onError: () => {
+            hideLoader();
             console.log("Error");
         }
     })
@@ -73,11 +87,13 @@ const Home = () => {
         mutationKey: ['ExtractResumeJsonMutation'],
         mutationFn: (payload: IExtractJsonPayload) => ExtractJDJson(payload),
         onSuccess: (data) => {
+            hideLoader();
             setConvertedJson({
-                job_description: JSON.stringify((data as any)?.output)
+                ...convertedJson, job_description: JSON.stringify((data as any)?.output)
             })
         },
         onError: () => {
+            hideLoader();
             console.log("Error");
         }
     })
@@ -87,9 +103,14 @@ const Home = () => {
         mutationKey: ['AnalyzeMutation'],
         mutationFn: (payload: IAnalyzePayload) => Analyze(payload),
         onSuccess: (data) => {
-            console.log(data);
+            if (data) {
+                setResumeInfo(data.output);
+            }
+            navigate({ pathname: "/user" })
+            hideLoader();
         },
         onError: () => {
+            hideLoader();
             console.log("Error");
         }
 
@@ -97,23 +118,25 @@ const Home = () => {
 
     //  Call RECOGNIZE API
     const callRecognizeAPI = async (name: "resume" | "jd", imageBase64: string) => {
+        showLoader();
         const payload: IRecognizePayload = {
             imageBase64
         }
         const response = await RecognizeMutation.mutateAsync(payload);
         if (response?.data?.text && name === "resume") {
-            setConvertedJson({
-                resume: response.data.text,
+            setPrompt({
+                ...prompt, resume: response.data.text,
             })
         } else if (name === "jd" && response?.data?.text) {
-            setConvertedJson({
-                job_description: response.data.text
+            setPrompt({
+                ...prompt, job_description: response.data.text
             })
         }
     }
 
     // Call Extract JSON API 
     const callExtractJSON = async (name: string, text: string) => {
+        showLoader();
         if (name === "resume") {
             await ExtractResumeJsonMutation.mutateAsync({ prompt: text });
         }
@@ -124,6 +147,7 @@ const Home = () => {
 
     // Call Analyze API
     const callAnalyzeAPI = async () => {
+        showLoader();
         const payload: IAnalyzePayload = {
             resume: convertedJson.resume as string,
             job_description: convertedJson.job_description as string
@@ -149,13 +173,13 @@ const Home = () => {
                 <FormProvider {...methods}>
                     <Box sx={styles.flex1}>
                         <FileUploader name="resume" title="Upload Resume" />
-                        <AppButton disabled={Boolean(convertedJson.resume === '')} text="Extract JSON" onClick={() => callExtractJSON('resume', convertedJson.resume ?? '')} />
+                        <AppButton disabled={Boolean(prompt.resume === '')} text={convertedJson.resume ? "Extracted" : "Extract JSON"} onClick={() => callExtractJSON('resume', prompt.resume ?? '')} isSuccess={convertedJson.resume !== ""} />
 
                     </Box>
                     <Box sx={styles.flex1}>
                         <FileUploader name="jd" title="Upload JD (Job Description)" />
                         <Box sx={styles.justifyEnd}>
-                            <AppButton disabled={Boolean(convertedJson.job_description === '')} text="Extract JSON" onClick={() => callExtractJSON('jd', convertedJson.job_description ?? '')} />
+                            <AppButton disabled={Boolean(prompt.job_description === '')} text={convertedJson.job_description ? "Extracted" : "Extract JSON"} onClick={() => callExtractJSON('jd', prompt.job_description ?? '')} isSuccess={convertedJson.job_description !== ""} />
                         </Box>
                     </Box>
                 </FormProvider>
@@ -164,6 +188,9 @@ const Home = () => {
             <Box sx={styles.justifyCenter}>
                 <AppButton text="Process" onClick={() => callAnalyzeAPI()} sx={styles.processBtn} />
             </Box>
+            {
+                loader && <AppLoader />
+            }
         </Box>
     )
 }

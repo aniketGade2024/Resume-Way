@@ -1,6 +1,7 @@
 import { Button, CircularProgress, SxProps } from "@mui/material";
 import ButtonStyles from "./styles";
 import theme from "@/theme/theme";
+import OfflinePinIcon from '@mui/icons-material/OfflinePin';
 
 type IAppButton = {
     text: string;
@@ -8,14 +9,16 @@ type IAppButton = {
     sx?: SxProps;
     isLoading?: boolean;
     disabled?: boolean;
+    isSuccess?: boolean;
     [x: string]: any;
 }
 
-const AppButton = ({ text, onClick, isLoading, disabled, sx, ...rest }: IAppButton) => {
+const AppButton = ({ text, onClick, isLoading, disabled, isSuccess, sx, ...rest }: IAppButton) => {
     const styles = ButtonStyles(theme);
 
     return (
-        <Button disabled={disabled} sx={{ ...styles.button, ...sx } as any} onClick={onClick} {...rest}>{text}{isLoading && <CircularProgress sx={styles.loader} color="info" size={25} />}</Button>
+        <Button disabled={disabled} sx={{ ...styles.button, ...sx } as any} onClick={onClick} {...rest} endIcon={isSuccess ? <OfflinePinIcon color="success"  /> : null}>{text}{isLoading && <CircularProgress sx={styles.loader} color="info" size={25} />}</Button>
+
     )
 }
 

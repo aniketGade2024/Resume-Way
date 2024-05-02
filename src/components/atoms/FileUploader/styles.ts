@@ -101,9 +101,13 @@ const FileUploaderStyles = (theme: Theme) => ({
         color: "rgba(0,0,0,0.8)",
     },
     selectedImg: {
+        maxWidth: "100%",
+        maxHeight: "100%",
+        overflow: "hidden",
         img: {
             width: "100%",
             height: "100%",
+            maxHeight: "100%",
             objectFit: "cover",
         }
     }

@@ -1,31 +1,56 @@
 import IStyle from "@/types/common";
 import { Theme } from "@mui/material";
 
-const CardStyles = (theme:Theme) => ({
-    card: {
-        width:"300px",
-        borderRadius: "8px",
-        overflow: "hidden",
-        margin: "20px 0",
-        background:theme.palette.info.main,
-    },
-
-    cardContent: {
-        height:"100%",
+const CardStyles = (theme: Theme) => ({
+    box: {
+        width: "25%",
+        backgroundColor: theme.palette.info.main,
         padding: "20px",
-        display:"flex",
-        flexDirection:"column",
-        justifyContent:"space-between",
-        gap:"40px",
+        marginBottom: "20px",
+        borderRadius: "10px",
+        boxShadow: '0px 4px 10px rgba(0, 0, 0, 0.1)',
     },
-
-    cardTitle: {
-        fontSize: "1rem",
+    content: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
     },
-
-    cardSubtitle: {
-        fontSize:"1rem",
+    image: {
+        width: '100px',
+        height: '100px',
+        borderRadius: '50%',
+        overflow: 'hidden',
+        marginBottom: "20px",
     },
+    icons: {
+        display: 'flex',
+        justifyContent: 'center',
+        marginBottom: "20px",
+        '& button': {
+            margin: "10px",
+        },
+    },
+    button: {
+        display: "flex",
+        justifyContent: "center",
+        '& button': {
+            marginTop: "50px",
+        },
+    },
+    dFlex: {
+        display: "flex",
+        gap: "15px"
+    },
+    colFlex: {
+        display: "flex",
+        flexDirection: "column",
+        gap: "20px",
+        marginTop: "40px"
+    },
+    text:{
+        fontSize:"14px"
+    }
+    
 
 } as IStyle)
 

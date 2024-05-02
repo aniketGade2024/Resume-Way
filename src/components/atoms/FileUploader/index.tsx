@@ -40,11 +40,11 @@ const FiledUploader = ({ name, title }: IFileUploader) => {
         <Box sx={styles.container}>
           <Box sx={styles.card}>
             <Typography variant="h3">{title ?? "Upload File"}</Typography>
-            <Box sx={{ ...styles.dropBox, borderStyle: file ? "none" : "dotted", boxShadow: file ? "0px 0px 10px 0px rgba(0, 0, 0, 0.5)" : "none" }}>
+            <Box sx={{ ...styles.dropBox, borderStyle: file ? "none" : "dotted", boxShadow: file ? "0px 0px 10px 0px rgba(0, 0, 0, 0.5)" : "none", maxHeight: file ? "500px" : "auto" }}>
               {
                 file ? (
                   <Box sx={styles.selectedImg}>
-                    <img src={file}/>
+                    <img src={file} />
                   </Box>
                 ) : (
                   <>
