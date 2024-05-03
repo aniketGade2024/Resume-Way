@@ -6,8 +6,6 @@ import useAppStore from "@/store";
 const UserInfo = () => {
     const styles = UserInfoStyles();
     const { resumeInfo } = useAppStore();
-
-
     return (
         <Box sx={styles.main}>
             <AppCard resumeInfo={resumeInfo} />

@@ -12,7 +12,8 @@ export const apiURLs = {
     recognize: "/recognize/",
     analyze: "/analyze/",
     extractResumeJson: '/extract_resume_json/',
-    extractJdJson:'/extract_JD_json/'
+    extractJdJson: '/extract_JD_json/',
+    generateQuestions: '/generate_questions/'
 }
 
 export default apiInstance;

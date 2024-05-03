@@ -22,11 +22,11 @@ export const ResponseAnalyzeSchema = z.object({
         }),
         skills: z.object({
             job_skills: z.array(z.string()),
-            candidate_skills: z.array(z.string()),
+            resume_skills: z.array(z.string()),
         }),
         education: z.object({
             job_education: z.string(),
-            candidate_education: z.string(),
+            resume_education: z.string(),
         }),
         yearsOfExperience: z.object({
             job_experience: z.number(),
@@ -34,9 +34,9 @@ export const ResponseAnalyzeSchema = z.object({
         }),
         responsibilitiesTaken: z.object({
             job_responsibilities: z.array(z.string()),
-            candidate_responsibilities: z.array(z.string())
+            resume_responsibilities: z.array(z.string())
         }),
-        domain: z.array(z.string()),
-        confidence_score: z.number(),
+        domain: z.string(),
+        confidence: z.number(),
     })
 });

@@ -4,6 +4,11 @@ import theme from "@/theme/theme";
 import { IResumeInfo } from "@/store/createInfoSlice";
 import { matchSkills } from "@/utils/helpers/common";
 import styled from "@emotion/styled";
+import { useMutation } from "@tanstack/react-query";
+import { IGenerateQuestionsPayload } from "@/types/generateQuestions";
+import GenerateQuestions from "@/services/generateQuestions";
+import { useNavigate } from "react-router-dom";
+import useAppStore from "@/store";
 
 type ICard = {
     resumeInfo: IResumeInfo[];
@@ -31,9 +36,32 @@ const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
     },
 }));
 
+
 const AppCard = ({ resumeInfo }: ICard) => {
     const styles = CardStyles(theme);
-    console.log(resumeInfo,'121312312323');
+    const navigate = useNavigate();
+    const {setReport} = useAppStore();
+
+    const GenerateQuestionsMutation = useMutation({
+        mutationKey: ['GenerateQuestionsMutation'],
+        mutationFn: (payload: IGenerateQuestionsPayload) => GenerateQuestions(payload),
+        onSuccess: (data) => {
+            if (data?.success) {
+                setReport(data.output);
+                navigate("/questions");
+            }
+        },
+        onError: (err) => {
+            console.log(err)
+        }
+    })
+
+    const callGenerateQuestionsAPI = async (index: number) => {
+        const payload: string = JSON.stringify(resumeInfo[index])
+
+        await GenerateQuestionsMutation.mutateAsync({ report: payload });
+    }
+
     return (
         <Box>
             {
@@ -57,9 +85,9 @@ const AppCard = ({ resumeInfo }: ICard) => {
                                         <Typography>
                                             Education:
                                         </Typography>
-                                        <HtmlTooltip title={<ColBox required={resumeInfo.education.job_education} candidate={resumeInfo.education.candidate_education} />} arrow>
+                                        <HtmlTooltip title={<ColBox required={resumeInfo.education.job_education} candidate={resumeInfo.education.resume_education} />} arrow>
                                             <Typography>
-                                                {resumeInfo.education.candidate_education}
+                                                {resumeInfo.education.resume_education}
                                             </Typography>
 
                                         </HtmlTooltip>
@@ -81,9 +109,9 @@ const AppCard = ({ resumeInfo }: ICard) => {
                                         <Typography>
                                             Skills:
                                         </Typography>
-                                        <HtmlTooltip title={<ContentTable required={resumeInfo.skills.job_skills} candidate={resumeInfo.skills.candidate_skills} />}>
+                                        <HtmlTooltip title={<ContentTable required={resumeInfo.skills.job_skills} candidate={resumeInfo.skills.resume_skills} />}>
                                             <Typography>
-                                                {matchSkills(resumeInfo.skills.job_skills, resumeInfo.skills.candidate_skills)}
+                                                {matchSkills(resumeInfo.skills.job_skills, resumeInfo.skills.resume_skills)}
                                             </Typography>
 
                                         </HtmlTooltip>
@@ -94,9 +122,9 @@ const AppCard = ({ resumeInfo }: ICard) => {
                                         <Typography>
                                             Responsibilities:
                                         </Typography>
-                                        <HtmlTooltip title={<ContentTable required={resumeInfo.responsibilitiesTaken.job_responsibilities} candidate={resumeInfo.responsibilitiesTaken.candidate_responsibilities} />}>
+                                        <HtmlTooltip title={<ContentTable required={resumeInfo.responsibilitiesTaken.job_responsibilities} candidate={resumeInfo.responsibilitiesTaken.resume_responsibilities} />}>
                                             <Typography>
-                                                {matchSkills(resumeInfo.responsibilitiesTaken.job_responsibilities, resumeInfo.responsibilitiesTaken.candidate_responsibilities)}
+                                                {matchSkills(resumeInfo.responsibilitiesTaken.job_responsibilities, resumeInfo.responsibilitiesTaken.resume_responsibilities)}
                                             </Typography>
 
                                         </HtmlTooltip>
@@ -118,13 +146,13 @@ const AppCard = ({ resumeInfo }: ICard) => {
                                             Confidence:
                                         </Typography>
                                         <Typography>
-                                            {`${Number(resumeInfo.confidence_score) * 100}%`}
+                                            {`${Number(resumeInfo.confidence) * 100}%`}
                                         </Typography>
                                     </Box>
                                 </Box>
 
                                 <Box sx={styles.button}>
-                                    <Button variant="contained" color="primary">Generate Questionnaires</Button>
+                                    <Button variant="contained" color="primary" onClick={() => callGenerateQuestionsAPI(index)}>Generate Questionnaires</Button>
                                 </Box>
                             </Box>
                         </Box>
@@ -136,6 +164,7 @@ const AppCard = ({ resumeInfo }: ICard) => {
 
 }
 
+
 const ColBox = ({ required, candidate }: IColBox) => {
     const styles = CardStyles(theme);
     return (
@@ -145,6 +174,7 @@ const ColBox = ({ required, candidate }: IColBox) => {
         </Stack>
     )
 }
+
 
 const ContentTable = ({ required, candidate }: ITables) => {
     return (

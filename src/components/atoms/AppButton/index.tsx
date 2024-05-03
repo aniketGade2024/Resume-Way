@@ -8,16 +8,17 @@ type IAppButton = {
     onClick?: () => void;
     sx?: SxProps;
     isLoading?: boolean;
+    loadingText?: string;
     disabled?: boolean;
     isSuccess?: boolean;
     [x: string]: any;
 }
 
-const AppButton = ({ text, onClick, isLoading, disabled, isSuccess, sx, ...rest }: IAppButton) => {
+const AppButton = ({ text, onClick, isLoading, disabled, isSuccess, loadingText, sx, ...rest }: IAppButton) => {
     const styles = ButtonStyles(theme);
 
     return (
-        <Button disabled={disabled} sx={{ ...styles.button, ...sx } as any} onClick={onClick} {...rest} endIcon={isSuccess ? <OfflinePinIcon color="success"  /> : null}>{text}{isLoading && <CircularProgress sx={styles.loader} color="info" size={25} />}</Button>
+        <Button disabled={disabled} sx={{ ...styles.button, ...sx } as any} onClick={onClick} {...rest} endIcon={isSuccess ? <OfflinePinIcon color="success" /> : null}>{isLoading ? loadingText : text}{isLoading && <CircularProgress sx={styles.loader} color="info" size={25} />}</Button>
 
     )
 }

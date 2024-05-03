@@ -1,6 +1,6 @@
 import React, { ComponentType } from 'react'
 import { Route, Routes } from 'react-router-dom'
-import { Home, UserInfo } from './pages'
+import { Home, Questionnaires, UserInfo } from './pages'
 
 type IRoutes = {
     path: string,
@@ -15,6 +15,10 @@ const routes: IRoutes[] = [
     {
         path: '/user',
         component: UserInfo
+    },
+    {
+        path:"/questions",
+        component: Questionnaires
     }
 ]
 
