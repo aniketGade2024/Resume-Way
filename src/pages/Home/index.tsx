@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { AppButton, FileUploader } from "@/components/atoms";
-import { Box, Typography } from "@mui/material";
+import { AppAlert, AppButton, FileUploader } from "@/components/atoms";
+import { AlertProps, Box, Typography } from "@mui/material";
 import HomePageStyles from "./styles";
 import { FormProvider, useForm } from "react-hook-form";
 import React from "react";
@@ -13,13 +13,22 @@ import { IAnalyzePayload } from "@/types/analyze";
 import Analyze from "@/services/analyze";
 import { ExtractJDJson, ExtractResumeJson } from "@/services/extractJson";
 import { IExtractJsonPayload } from "@/types/extractJson";
-import { useLoader } from "@/hooks";
+import { useLoader, useToggleSnackBar } from "@/hooks";
 import useAppStore from "@/store";
 import { useNavigate } from "react-router-dom";
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 
 type IAnalyze = {
     resume?: string;
     job_description?: string;
+}
+
+
+type ISnackBar = {
+    title: "Success" | "Error" | "Warning" | "Info" | "";
+    subTitle: string;
+    severity: AlertProps["severity"]
 }
 
 const Home = () => {
@@ -34,11 +43,19 @@ const Home = () => {
     })
 
     const [loadingText, setLoadingText] = React.useState<"resume" | "jd" | "process" | undefined>();
+    const [isUploading, setIsUploading] = React.useState<boolean>(false);
+
+    const [snackBar, setSnackBar] = React.useState<ISnackBar>({
+        title: "",
+        subTitle: "",
+        severity: "info",
+    })
 
     const styles = HomePageStyles();
     const { loader, showLoader, hideLoader } = useLoader();
-    const { setResumeInfo } = useAppStore();
+    const { setResumeInfo, acceptedResumeScore, setAcceptedResumeScore } = useAppStore();
     const navigate = useNavigate();
+    const { showToggle, toggleSnackBar } = useToggleSnackBar();
 
     const FileUploaderSchema = z.object({
         resume: z.string().min(1, 'Resume File is Required'),
@@ -54,7 +71,15 @@ const Home = () => {
         }
     });
 
-    const { watch } = methods;
+    const { watch, reset } = methods;
+
+    const setResumeScore = (type: "increment" | "decrement") => {
+        if (type === "increment") {
+            setAcceptedResumeScore(acceptedResumeScore + 1);
+        } else {
+            setAcceptedResumeScore(acceptedResumeScore - 1);
+        }
+    }
 
     //  Recognize Mutation 
     const RecognizeMutation = useMutation({
@@ -64,7 +89,12 @@ const Home = () => {
             hideLoader();
         },
         onError: () => {
-            console.log("Error");
+            console.log("Error =>");
+            setIsUploading(false);
+            setSnackBar({ title: "Error", subTitle: "Something went wrong ....", severity: "error" });
+            hideLoader();
+            toggleSnackBar();
+            reset();
         }
     })
 
@@ -73,15 +103,18 @@ const Home = () => {
         mutationKey: ['ExtractResumeJsonMutation'],
         mutationFn: (payload: IExtractJsonPayload) => ExtractResumeJson(payload),
         onSuccess: (data) => {
-            setLoadingText(undefined);
-            hideLoader();
             setConvertedJson({
                 ...convertedJson, resume: JSON.stringify((data as any)?.output)
-            })
+            });
+            setSnackBar({ title: 'Success', subTitle: "JSON Extracted Successfully!", severity: "success" })
+            setLoadingText(undefined);
+            hideLoader();
+            toggleSnackBar();
         },
         onError: () => {
+            setSnackBar({ title: 'Error', subTitle: "Operation Failed", severity: "error" });
             hideLoader();
-            console.log("Error");
+            toggleSnackBar();
         }
     })
 
@@ -90,15 +123,18 @@ const Home = () => {
         mutationKey: ['ExtractResumeJsonMutation'],
         mutationFn: (payload: IExtractJsonPayload) => ExtractJDJson(payload),
         onSuccess: (data) => {
-            setLoadingText(undefined);
-            hideLoader();
             setConvertedJson({
                 ...convertedJson, job_description: JSON.stringify((data as any)?.output)
-            })
+            });
+            setSnackBar({ title: 'Success', subTitle: "JSON Extracted Successfully!", severity: "success" })
+            setLoadingText(undefined);
+            hideLoader();
+            toggleSnackBar();
         },
         onError: () => {
             hideLoader();
-            console.log("Error");
+            setSnackBar({ title: 'Error', subTitle: "Operation Failed", severity: "error" });
+            toggleSnackBar();
         }
     })
 
@@ -107,7 +143,6 @@ const Home = () => {
         mutationKey: ['AnalyzeMutation'],
         mutationFn: (payload: IAnalyzePayload) => Analyze(payload),
         onSuccess: (data) => {
-            console.log(data);
             if (data) {
                 setResumeInfo(data.output);
             }
@@ -115,8 +150,9 @@ const Home = () => {
             hideLoader();
         },
         onError: () => {
+            setSnackBar({ title: 'Error', subTitle: "The Model Hallucinated! Please Try Again", severity: "error" });
             hideLoader();
-            console.log("Error");
+            toggleSnackBar();
         }
 
     })
@@ -131,11 +167,13 @@ const Home = () => {
         if (response?.data?.text && name === "resume") {
             setPrompt({
                 ...prompt, resume: response.data.text,
-            })
+            });
+            setIsUploading(false);
         } else if (name === "jd" && response?.data?.text) {
             setPrompt({
                 ...prompt, job_description: response.data.text
-            })
+            });
+            setIsUploading(false);
         }
     }
 
@@ -165,38 +203,57 @@ const Home = () => {
 
     React.useEffect(() => {
         if (watch('resume')) {
+            setIsUploading(true);
             callRecognizeAPI("resume", watch('resume'));
         }
     }, [watch('resume')]);
 
     React.useEffect(() => {
         if (watch('jd')) {
+            setIsUploading(true);
             callRecognizeAPI("jd", watch('jd'))
         }
-    }, [watch('jd')])
+    }, [watch('jd')]);
 
     return (
         <Box sx={styles.card}>
             <Box sx={styles.dFlex}>
                 <FormProvider {...methods}>
                     <Box sx={styles.flex1}>
-                        <FileUploader name="resume" title="Upload Resume" />
-                        <AppButton disabled={Boolean(prompt.resume === '')} text={convertedJson.resume ? "Extracted" : "Extract JSON"} onClick={() => callExtractJSON('resume', prompt.resume ?? '')} isSuccess={convertedJson.resume !== ""} isLoading={Boolean(loader && loadingText === "resume")} loadingText="Extracting" />
+                        <FileUploader name="resume" title="Upload Resume" isUploading={Boolean(isUploading && watch("resume") && !prompt.resume)} />
+                        <AppButton disabled={Boolean(prompt.resume === '')} text={convertedJson.resume ? "Extracted" : "Extract JSON"} onClick={convertedJson.resume ? () => { } : () => callExtractJSON('resume', prompt.resume ?? '')} isSuccess={convertedJson.resume !== ""} isLoading={Boolean(loader && loadingText === "resume")} loadingText="Extracting" />
 
                     </Box>
                     <Box sx={styles.flex1}>
-                        <FileUploader name="jd" title="Upload JD (Job Description)" />
+                        <FileUploader name="jd" title="Upload JD (Job Description)" isUploading={Boolean(isUploading && watch("jd") && !prompt.job_description)} />
                         <Box sx={styles.justifyEnd}>
-                            <AppButton disabled={Boolean(prompt.job_description === '')} text={convertedJson.job_description ? "Extracted" : "Extract JSON"} onClick={() => callExtractJSON('jd', prompt.job_description ?? '')} isSuccess={convertedJson.job_description !== ""} isLoading={Boolean(loader && loadingText === "jd")} loadingText="Extracting" />
+                            <AppButton disabled={Boolean(prompt.job_description === '' || !convertedJson.resume)} text={convertedJson.job_description ? "Extracted" : "Extract JSON"} onClick={convertedJson.job_description ? () => { } : () => callExtractJSON('jd', prompt.job_description ?? '')} isSuccess={convertedJson.job_description !== ""} isLoading={Boolean(loader && loadingText === "jd")} loadingText="Extracting" />
                         </Box>
                     </Box>
                 </FormProvider>
             </Box>
-            <Typography sx={styles.score}>Accepted Resume Score : <Typography component={"span"} sx={styles.span}>50%</Typography></Typography>
+            <Box sx={{ ...styles.flex, gap: "10px", justifyContent: "center" }}>
+                <Typography sx={styles.score}>Accepted Resume Score :</Typography>
+                <Box sx={styles.flex}>
+                    <Typography component={"span"} sx={styles.span}>
+                        {acceptedResumeScore}%
+                    </Typography>
+                    <Box sx={styles.colFlex}>
+                        <ArrowUpwardIcon color="success" sx={{ cursor: "pointer" }} onClick={() => setResumeScore("increment")} />
+                        <ArrowDownwardIcon color={acceptedResumeScore > 0 ? "error" : "info"} sx={{ cursor: acceptedResumeScore > 0 ? "pointer" : "default" }} onClick={acceptedResumeScore > 0 ? () => setResumeScore("decrement") : () => { }} />
+                    </Box>
+                </Box>
+            </Box>
+
             <Box sx={styles.justifyCenter}>
                 <AppButton text="Process" onClick={() => callAnalyzeAPI()} sx={styles.processBtn} disabled={Boolean(!convertedJson.resume && !convertedJson.job_description)} isLoading={Boolean(loader && loadingText === "process")} loadingText="Processing" />
             </Box>
-         </Box>
+            {
+                Boolean(showToggle) && <AppAlert isOpen={showToggle} handleClose={toggleSnackBar} title={snackBar.title} subTitle=
+                    {snackBar.subTitle} severity={snackBar.severity} />
+
+            }
+        </Box>
     )
 }
 export default Home;

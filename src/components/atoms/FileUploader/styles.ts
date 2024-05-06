@@ -94,7 +94,8 @@ const FileUploaderStyles = (theme: Theme) => ({
         right: "-20px",
         bottom: "-10px",
         backgroundColor: theme.palette.info.main,
-        cursor: "pointer"
+        cursor: "pointer",
+        zIndex:1000
     },
     rmText: {
         fontSize: "20px",
@@ -110,7 +111,21 @@ const FileUploaderStyles = (theme: Theme) => ({
             maxHeight: "100%",
             objectFit: "cover",
         }
+    },
+    backDrop:
+    {
+        maxWidth: "100%", maxHeight: "100%", position: "absolute", borderRadius: "5px",
+    },
+    loaderBox: {
+        width: "100%",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center"
+    },
+    progressBar: {
+        width: "50%",
     }
+
 } as IStyle)
 
 export default FileUploaderStyles;

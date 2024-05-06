@@ -10,6 +10,8 @@ export default async function Analyze(payload: IAnalyzePayload) {
         const response = await apiInstance.post(apiURLs.analyze, payload);
         const processedResponse = await response.data;
         return ResponseAnalyzeSchema.parse(processedResponse)
-    } catch { }
+    } catch {
+        return ResponseAnalyzeSchema.parse({})
+    }
 
 }

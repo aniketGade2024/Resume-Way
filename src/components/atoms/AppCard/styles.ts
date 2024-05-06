@@ -3,7 +3,7 @@ import { Theme } from "@mui/material";
 
 const CardStyles = (theme: Theme) => ({
     box: {
-        width: "25%",
+        width: window.innerWidth * 0.25,
         backgroundColor: theme.palette.info.main,
         padding: "20px",
         marginBottom: "20px",
@@ -47,11 +47,20 @@ const CardStyles = (theme: Theme) => ({
         gap: "20px",
         marginTop: "40px"
     },
-    text:{
-        fontSize:"14px"
+    text: {
+        fontSize: "14px"
+    },
+    title: {
+        fontWeight: "700",
+        textTransform: "uppercase",
+        paddingBottom: "5px"
+    },
+    grid: {
+        display: "flex",
+        rowGap: "20px",
+        columnGap: "30px",
+        flexWrap: "wrap"
     }
-    
-
 } as IStyle)
 
 export default CardStyles;

@@ -4,20 +4,23 @@ import { Home, Questionnaires, UserInfo } from './pages'
 
 type IRoutes = {
     path: string,
-    component: ComponentType
+    component: ComponentType,
+    index?: boolean,
 }
 
-const routes: IRoutes[] = [
+// eslint-disable-next-line react-refresh/only-export-components
+export const routes: IRoutes[] = [
     {
         path: '/',
-        component: Home
+        component: Home,
+        index: true
     },
     {
-        path: '/user',
+        path: '/profiles',
         component: UserInfo
     },
     {
-        path:"/questions",
+        path: "/questions",
         component: Questionnaires
     }
 ]
@@ -29,7 +32,7 @@ const AppRouter = () => {
             {
                 routes.map((item, index) => {
                     return (
-                        <Route key={index} path={item.path} Component={item.component} />
+                        <Route key={index} path={item.path} Component={item.component} index={item?.index ? true : false}  />
                     )
                 })
             }

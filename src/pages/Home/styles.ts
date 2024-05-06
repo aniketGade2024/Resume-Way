@@ -17,7 +17,7 @@ const HomePageStyles = () => ({
     },
 
     span: {
-        fontSize: "16px",
+        fontSize: "18px",
         fontWeight: "bolder",
     },
 
@@ -35,8 +35,15 @@ const HomePageStyles = () => ({
         display: "flex",
         justifyContent: "center"
     },
-    processBtn:{
-        marginTop:"5%"
+    processBtn: {
+        marginTop: "5%"
+    },
+    flex: {
+        display: "flex",
+        alignItems: "center"
+    },
+    colFlex: {
+        display: "flex", flexDirection: "column", gap: "5px"
     }
 })
 

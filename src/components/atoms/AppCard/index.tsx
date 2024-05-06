@@ -1,4 +1,4 @@
-import { Box, Button, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, TooltipProps, Typography, tooltipClasses } from "@mui/material";
+import { Badge, Box, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, TooltipProps, Typography, tooltipClasses } from "@mui/material";
 import CardStyles from "./styles";
 import theme from "@/theme/theme";
 import { IResumeInfo } from "@/store/createInfoSlice";
@@ -9,6 +9,8 @@ import { IGenerateQuestionsPayload } from "@/types/generateQuestions";
 import GenerateQuestions from "@/services/generateQuestions";
 import { useNavigate } from "react-router-dom";
 import useAppStore from "@/store";
+import { useLoader } from "@/hooks";
+import AppButton from "../AppButton";
 
 type ICard = {
     resumeInfo: IResumeInfo[];
@@ -36,34 +38,46 @@ const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
     },
 }));
 
+const StyledBadge = styled(Badge)(() => ({
+    '& .MuiBadge-badge': {
+        width: '20px',
+        height: '20px',
+        borderRadius: '50%', // This makes it circular
+        backgroundColor: 'green', // You can change the background color as needed
+    },
+}));
+
 
 const AppCard = ({ resumeInfo }: ICard) => {
     const styles = CardStyles(theme);
     const navigate = useNavigate();
-    const {setReport} = useAppStore();
+    const { setReport } = useAppStore();
+    const { loader, showLoader, hideLoader } = useLoader();
 
     const GenerateQuestionsMutation = useMutation({
         mutationKey: ['GenerateQuestionsMutation'],
         mutationFn: (payload: IGenerateQuestionsPayload) => GenerateQuestions(payload),
         onSuccess: (data) => {
+            hideLoader();
             if (data?.success) {
                 setReport(data.output);
                 navigate("/questions");
             }
         },
         onError: (err) => {
+            hideLoader();
             console.log(err)
         }
     })
 
     const callGenerateQuestionsAPI = async (index: number) => {
-        const payload: string = JSON.stringify(resumeInfo[index])
-
+        showLoader();
+        const payload: string = JSON.stringify(resumeInfo[index]);
         await GenerateQuestionsMutation.mutateAsync({ report: payload });
     }
 
     return (
-        <Box>
+        <Box sx={styles.grid}>
             {
                 (resumeInfo || []).map((resumeInfo, index) => {
                     return (
@@ -73,7 +87,7 @@ const AppCard = ({ resumeInfo }: ICard) => {
                                     <Box sx={styles.image}>
                                         <img src={`https://api.dicebear.com/8.x/fun-emoji/svg?seed=${resumeInfo.name}`} alt="Profile Image" />
                                     </Box>
-                                    <Typography>{resumeInfo.name}</Typography>
+                                    <Typography sx={styles.title}>{resumeInfo.name}</Typography>
                                     <Box>
                                         <Typography>{resumeInfo.domain}</Typography>
                                     </Box>
@@ -86,10 +100,13 @@ const AppCard = ({ resumeInfo }: ICard) => {
                                             Education:
                                         </Typography>
                                         <HtmlTooltip title={<ColBox required={resumeInfo.education.job_education} candidate={resumeInfo.education.resume_education} />} arrow>
-                                            <Typography>
+                                            {/* <Typography>
                                                 {resumeInfo.education.resume_education}
-                                            </Typography>
+                                            </Typography> */}
+                                            <StyledBadge>
+                                                {resumeInfo.education.resume_education}
 
+                                            </StyledBadge>
                                         </HtmlTooltip>
                                     </Box>
 
@@ -152,7 +169,7 @@ const AppCard = ({ resumeInfo }: ICard) => {
                                 </Box>
 
                                 <Box sx={styles.button}>
-                                    <Button variant="contained" color="primary" onClick={() => callGenerateQuestionsAPI(index)}>Generate Questionnaires</Button>
+                                    <AppButton onClick={() => callGenerateQuestionsAPI(index)} text="Generate Questionnaires" isLoading={loader} loadingText="Generating" />
                                 </Box>
                             </Box>
                         </Box>

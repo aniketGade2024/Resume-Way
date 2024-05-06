@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material";
+import { Backdrop, Box, LinearProgress, Typography } from "@mui/material";
 import FileUploadIcon from "@/assets/uploadIcon.png"
 import FileUploaderStyles from "./styles";
 import theme from "@/theme/theme";
@@ -9,17 +9,18 @@ import { Controller, useFormContext } from "react-hook-form";
 type IFileUploader = {
   name: string;
   title?: string;
+  isUploading?: boolean;
 
 }
 
-const FiledUploader = ({ name, title }: IFileUploader) => {
-  const { control, setValue } = useFormContext();
+const FiledUploader = ({ name, title, isUploading }: IFileUploader) => {
+  const { control, setValue, getValues } = useFormContext();
+  const fieldValue = getValues(name);
   const [file, setFile] = React.useState();
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const selectedFile = e.target.files[0];
-      console.log(selectedFile);
       const base64File = await convertToBase64(selectedFile);
       if (base64File) {
         setValue(name, String(base64File).split(",")[1]);
@@ -33,6 +34,11 @@ const FiledUploader = ({ name, title }: IFileUploader) => {
     setFile(undefined);
   }
   const styles = FileUploaderStyles(theme);
+  React.useEffect(() => {
+    if (fieldValue === "") {
+      setFile(undefined);
+    }
+  }, [fieldValue])
 
   return (
     <Controller name={name} control={control} render={() => {
@@ -68,9 +74,23 @@ const FiledUploader = ({ name, title }: IFileUploader) => {
                   <Typography sx={styles.rmText}>X</Typography>
                 </Box>
               }
+              {
+                isUploading && (
+                  <Backdrop
+                    sx={styles.backDrop}
+                    open={isUploading}
+                  >
+                    <Box sx={styles.loaderBox}>
+                      <LinearProgress sx={styles.progressBar} color="success" />
+
+                    </Box>
+                  </Backdrop>
+                )
+              }
             </Box>
 
           </Box>
+
         </Box>
       )
     }} />

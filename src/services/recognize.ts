@@ -10,6 +10,8 @@ export default async function Recognize(payload: IRecognizePayload) {
         const response = await apiInstance.post(apiURLs.recognize, payload);
         const processedResponse = await response.data;
         return RecognizeResponseSchema.parse(processedResponse)
-    } catch { }
+    } catch {
+        return RecognizeResponseSchema.parse({})
+    }
 
 }

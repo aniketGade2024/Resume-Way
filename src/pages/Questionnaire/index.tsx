@@ -3,18 +3,45 @@ import { QuestionsPageStyles } from "./styles";
 import theme from "@/theme/theme";
 import { AppButton } from "@/components/atoms";
 import useAppStore from "@/store";
+import jsPDF from "jspdf";
 
 const Questionnaire = () => {
     const styles = QuestionsPageStyles(theme);
     const { report } = useAppStore();
+
+    //  print pdf
+    const convertToPDF = () => {
+        const content = document.getElementById("contentId");
+        const pdf = new jsPDF({ orientation: "p", unit: "pt", format: "a4", putOnlyUsedFonts: true, compress: false });
+        if (content) {
+            pdf.html(content, {
+                callback: function (pdf) {
+                    pdf.save('questionary.pdf');
+                },
+                x: 0,
+                y: 0,
+                html2canvas: {
+                    scrollX: 0,
+                    scrollY: 0,
+                    scale: 0.5,
+                    width: content.offsetWidth,
+                    height: content.offsetHeight
+                },
+            });
+        }
+    };
+
     return (
         <Box sx={styles.page}>
-            <Box sx={styles.sheet}>
+            <Box sx={styles.sheet} id="contentId">
 
-                <Box sx={styles.image}>
-                    <img src={`https://api.dicebear.com/8.x/fun-emoji/svg?seed=Pooja%20Shinde}`} alt="Profile Image" />
+                <Box sx={styles.spaceBetween}>
+                    <Box sx={styles.image}>
+                        <img src={`https://api.dicebear.com/8.x/fun-emoji/svg?seed=Pooja%20Shinde}`} alt="Profile Image" />
+                    </Box>
+                    <AppButton text="Print" onClick={() => convertToPDF()} />
+
                 </Box>
-
 
                 <Typography variant="h6" sx={styles.name}>{report.candidate.name}</Typography>
 
@@ -90,10 +117,6 @@ const Questionnaire = () => {
 
                     </Box>
                 </Box>
-
-            </Box>
-            <Box sx={styles.btnContainer}>
-                <AppButton text="Print" onClick={()=>window.print()}/>
 
             </Box>
         </Box>

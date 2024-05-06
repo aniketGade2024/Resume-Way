@@ -48,6 +48,8 @@ export interface IResumeSlice {
     setResumeInfo: (resumeInfo: IResumeInfo) => void;
     report: IReport;
     setReport: (report: IReport) => void;
+    acceptedResumeScore: number;
+    setAcceptedResumeScore: (score: number) => void;
 }
 
 const createInfoSlice: StateCreator<IResumeSlice> = set => ({
@@ -67,6 +69,10 @@ const createInfoSlice: StateCreator<IResumeSlice> = set => ({
     },
     setReport: (report: IReport) => {
         set({ report })
+    },
+    acceptedResumeScore: 0,
+    setAcceptedResumeScore: (score: number) => {
+        set({ acceptedResumeScore: score })
     }
 })
 

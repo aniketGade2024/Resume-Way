@@ -45,5 +45,10 @@ export const QuestionsPageStyles = (theme: Theme) => ({
         display: "flex",
         justifyContent: "flex-end",
         marginY: "20px"
+    },
+    spaceBetween: {
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "flex-start"
     }
 } as IStyle)
