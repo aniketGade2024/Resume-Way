@@ -3,7 +3,7 @@ import { Badge, Box, Stack, Table, TableBody, TableCell, TableHead, TableRow, To
 import CardStyles from "./styles";
 import theme from "@/theme/theme";
 import { IResumeInfo } from "@/store/createInfoSlice";
-import { matchSkills } from "@/utils/helpers/common";
+import { calculatePercentage, matchSkills } from "@/utils/helpers/common";
 import styled from "@emotion/styled";
 import { useMutation } from "@tanstack/react-query";
 import { IGenerateQuestionsPayload } from "@/types/generateQuestions";
@@ -15,6 +15,8 @@ import AppButton from "../AppButton";
 import React from "react";
 import AppAlert from "../AppAlert";
 import { ISnackBar } from "@/types/common";
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 type ICard = {
     resumeInfo: IResumeInfo[];
@@ -35,6 +37,7 @@ const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
     <Tooltip {...props} classes={{ popper: className }} />
 ))(() => ({
     [`& .${tooltipClasses.tooltip}`]: {
+        flexBasis: "55%",
         maxHeight: "300px",
         overflow: 'auto',
         backgroundColor: '#fff',
@@ -62,7 +65,7 @@ const AppCard = ({ resumeInfo }: ICard) => {
     })
     const styles = CardStyles(theme);
     const navigate = useNavigate();
-    const { setReport } = useAppStore();
+    const { setReport, acceptedResumeScore } = useAppStore();
     const { loader, showLoader, hideLoader } = useLoader();
     const { showToggle, toggleSnackBar } = useToggleSnackBar();
 
@@ -113,13 +116,10 @@ const AppCard = ({ resumeInfo }: ICard) => {
                                 <Box sx={styles.colFlex}>
 
                                     <Box sx={styles.dFlex}>
-                                        <Typography>
+                                        <Typography sx={styles.label}>
                                             Education:
                                         </Typography>
                                         <HtmlTooltip title={<ColBox required={resumeInfo.education.job_education} candidate={resumeInfo.education.resume_education} />} arrow>
-                                            {/* <Typography>
-                                                {resumeInfo.education.resume_education}
-                                            </Typography> */}
                                             <StyledBadge>
                                                 {resumeInfo.education.resume_education}
 
@@ -128,7 +128,7 @@ const AppCard = ({ resumeInfo }: ICard) => {
                                     </Box>
 
                                     <Box sx={styles.dFlex}>
-                                        <Typography>
+                                        <Typography sx={styles.label}>
                                             Location:
                                         </Typography>
                                         <HtmlTooltip title={<ColBox required={resumeInfo.location.job_location} candidate={resumeInfo.location.resume_location} />} >
@@ -140,49 +140,53 @@ const AppCard = ({ resumeInfo }: ICard) => {
                                     </Box>
 
                                     <Box sx={styles.dFlex}>
-                                        <Typography>
+                                        <Typography sx={styles.label}>
                                             Skills:
                                         </Typography>
                                         <HtmlTooltip title={<ContentTable required={resumeInfo.skills.job_skills} candidate={resumeInfo.skills.resume_skills} />}>
-                                            <Typography>
+                                            <Box sx={{ ...styles.badge, ...(calculatePercentage(resumeInfo.skills.job_skills, resumeInfo.skills.resume_skills) > 50 ? styles.successBadge : styles.failedBadge) } as any}>
                                                 {matchSkills(resumeInfo.skills.job_skills, resumeInfo.skills.resume_skills)}
-                                            </Typography>
-
+                                            </Box>
                                         </HtmlTooltip>
 
                                     </Box>
 
                                     <Box sx={styles.dFlex}>
-                                        <Typography>
+                                        <Typography sx={styles.label}>
                                             Responsibilities:
                                         </Typography>
                                         <HtmlTooltip title={<ContentTable required={resumeInfo.responsibilitiesTaken.job_responsibilities} candidate={resumeInfo.responsibilitiesTaken.resume_responsibilities} />}>
-                                            <Typography>
+                                            <Box sx={{ ...styles.badge, ...(calculatePercentage(resumeInfo.responsibilitiesTaken.job_responsibilities, resumeInfo.responsibilitiesTaken.resume_responsibilities) > 50 ? styles.successBadge : styles.failedBadge) } as any}>
                                                 {matchSkills(resumeInfo.responsibilitiesTaken.job_responsibilities, resumeInfo.responsibilitiesTaken.resume_responsibilities)}
-                                            </Typography>
-
+                                            </Box>
                                         </HtmlTooltip>
                                     </Box>
 
                                     <Box sx={styles.dFlex}>
-                                        <Typography>
+                                        <Typography sx={styles.label}>
                                             Yrs. of Experience:
                                         </Typography>
                                         <HtmlTooltip title={<ColBox required={resumeInfo.yearsOfExperience.job_experience} candidate={resumeInfo.yearsOfExperience.resume_experience} />}>
-                                            <Typography>
+                                            <Box sx={{ ...styles.badge, ...((Math.round((resumeInfo.yearsOfExperience.job_experience / resumeInfo.yearsOfExperience.resume_experience) * 100)) > 50 ? styles.successBadge : styles.failedBadge) } as any}>
                                                 {`${resumeInfo.yearsOfExperience.resume_experience} / ${resumeInfo.yearsOfExperience.job_experience}`}
-                                            </Typography>
+                                            </Box>
                                         </HtmlTooltip>
                                     </Box>
 
                                     <Box sx={styles.dFlex}>
-                                        <Typography>
+                                        <Typography sx={styles.label}>
                                             Confidence:
                                         </Typography>
-                                        <Typography>
-                                            {`${Number(resumeInfo.confidence) * 100}%`}
-                                        </Typography>
-                                    </Box>
+                                        <HtmlTooltip title={<ColBox required={`${acceptedResumeScore}%`} candidate={`${Number(resumeInfo.confidence) * 100}%`} />}>
+                                            <Box sx={styles.dFlex}>
+                                                <Typography>
+                                                    {`${Number(resumeInfo.confidence) * 100}%`}
+                                                </Typography>
+                                                {
+                                                    Number(resumeInfo.confidence) * 100 >= acceptedResumeScore ? <CheckCircleIcon color="success" /> : <CancelIcon color="error" />
+                                                }
+                                            </Box>
+                                        </HtmlTooltip>                                </Box>
                                 </Box>
 
                                 <Box sx={styles.button}>

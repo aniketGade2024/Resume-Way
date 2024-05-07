@@ -39,7 +39,8 @@ const CardStyles = (theme: Theme) => ({
     },
     dFlex: {
         display: "flex",
-        gap: "15px"
+        gap: "15px",
+        alignItems: "center"
     },
     colFlex: {
         display: "flex",
@@ -60,6 +61,28 @@ const CardStyles = (theme: Theme) => ({
         rowGap: "20px",
         columnGap: "30px",
         flexWrap: "wrap"
+    },
+    label: {
+        color: "rgba(0,0,0,0.6)",
+        flexBasis: "45%",
+        fontSize:"14px"
+    },
+    badge: {
+        width: "46px", height: "46px",
+        padding: "5px",
+        borderRadius: "50%",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        fontSize: "14px"
+    },
+    successBadge :{
+        border: `2px solid ${theme.palette.success.main}`,
+        color: theme.palette.success.main,
+    },
+    failedBadge :{
+        border: `2px solid ${theme.palette.error.main}`,
+        color: theme.palette.error.main,
     }
 } as IStyle)
 

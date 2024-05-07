@@ -29,9 +29,7 @@ export const calculatePercentage = (jobSkills: string[], candidateSkills: string
         }
     });
 
-    const percentage = Math.round(matchedCount / candidateSkillsCount);
-
-    console.log(percentage)
+    const percentage = Math.round((matchedCount / candidateSkillsCount) * 100)
 
     return (
         percentage

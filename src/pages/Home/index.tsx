@@ -235,7 +235,7 @@ const Home = () => {
                         {acceptedResumeScore}%
                     </Typography>
                     <Box sx={styles.colFlex}>
-                        <ArrowUpwardIcon color="success" sx={{ cursor: "pointer" }} onClick={() => setResumeScore("increment")} />
+                        <ArrowUpwardIcon color={acceptedResumeScore < 100 ? "success" : "info"} sx={{ cursor: acceptedResumeScore < 100 ? "pointer" : "default" }} onClick={acceptedResumeScore < 100 ? () => setResumeScore("increment") : () => { }} />
                         <ArrowDownwardIcon color={acceptedResumeScore > 0 ? "error" : "info"} sx={{ cursor: acceptedResumeScore > 0 ? "pointer" : "default" }} onClick={acceptedResumeScore > 0 ? () => setResumeScore("decrement") : () => { }} />
                     </Box>
                 </Box>
