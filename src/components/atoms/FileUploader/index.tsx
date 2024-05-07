@@ -17,8 +17,10 @@ const FiledUploader = ({ name, title, isUploading }: IFileUploader) => {
   const { control, setValue, getValues } = useFormContext();
   const fieldValue = getValues(name);
   const [file, setFile] = React.useState();
+  const fileRef = React.useRef(null);
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log(e.target);
     if (e.target.files) {
       const selectedFile = e.target.files[0];
       const base64File = await convertToBase64(selectedFile);
@@ -34,6 +36,7 @@ const FiledUploader = ({ name, title, isUploading }: IFileUploader) => {
     setFile(undefined);
   }
   const styles = FileUploaderStyles(theme);
+
   React.useEffect(() => {
     if (fieldValue === "") {
       setFile(undefined);
@@ -46,9 +49,9 @@ const FiledUploader = ({ name, title, isUploading }: IFileUploader) => {
         <Box sx={styles.container}>
           <Box sx={styles.card}>
             <Typography variant="h3">{title ?? "Upload File"}</Typography>
-            <Box sx={{ ...styles.dropBox, borderStyle: file ? "none" : "dotted", boxShadow: file ? "0px 0px 10px 0px rgba(0, 0, 0, 0.5)" : "none", maxHeight: file ? "500px" : "auto" }}>
+            <Box id={name} sx={{ ...styles.dropBox, borderStyle: file ? "none" : "dotted", boxShadow: file ? "0px 0px 10px 0px rgba(0, 0, 0, 0.5)" : "none", maxHeight: file ? "500px" : "auto" }}>
               {
-                file ? (
+                file && fieldValue ? (
                   <Box sx={styles.selectedImg}>
                     <img src={file} />
                   </Box>
@@ -59,12 +62,10 @@ const FiledUploader = ({ name, title, isUploading }: IFileUploader) => {
                     </Box>
                     <Typography sx={styles.h4}>Select File here</Typography>
                     <Typography sx={styles.p}>Files Supported: jpg, jpeg, png, webp </Typography>
-                    <input type="file" accept="image/*" id="fileId" style={{ display: "none" }} onChange={(e) => handleChange(e)} />
-                    <label htmlFor="fileId">
-                      <Typography sx={styles.btn}>
-                        Choose File
-                      </Typography>
-                    </label>
+                    <input ref={fileRef} type="file" accept="image/*" id={name} style={{ display: "none" }} onChange={(e) => handleChange(e)} />
+                    <Typography sx={styles.btn} onClick={() => (fileRef.current as any).click()}>
+                      Choose File
+                    </Typography>
 
                   </>
                 )

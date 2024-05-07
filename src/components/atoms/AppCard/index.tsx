@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Badge, Box, Stack, Table, TableBody, TableCell, TableHead, TableRow, Tooltip, TooltipProps, Typography, tooltipClasses } from "@mui/material";
 import CardStyles from "./styles";
 import theme from "@/theme/theme";
@@ -9,8 +10,11 @@ import { IGenerateQuestionsPayload } from "@/types/generateQuestions";
 import GenerateQuestions from "@/services/generateQuestions";
 import { useNavigate } from "react-router-dom";
 import useAppStore from "@/store";
-import { useLoader } from "@/hooks";
+import { useLoader, useToggleSnackBar } from "@/hooks";
 import AppButton from "../AppButton";
+import React from "react";
+import AppAlert from "../AppAlert";
+import { ISnackBar } from "@/types/common";
 
 type ICard = {
     resumeInfo: IResumeInfo[];
@@ -31,11 +35,12 @@ const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
     <Tooltip {...props} classes={{ popper: className }} />
 ))(() => ({
     [`& .${tooltipClasses.tooltip}`]: {
-        maxHeight: "300px", overflow: 'auto',
+        maxHeight: "300px",
+        overflow: 'auto',
         backgroundColor: '#fff',
         color: '#000',
         border: '1px solid #dadde9',
-    },
+    } as any,
 }));
 
 const StyledBadge = styled(Badge)(() => ({
@@ -49,28 +54,40 @@ const StyledBadge = styled(Badge)(() => ({
 
 
 const AppCard = ({ resumeInfo }: ICard) => {
+    const [indexCalled, setIndexCalled] = React.useState<number>(-1);
+    const [snackBar, setSnackBar] = React.useState<ISnackBar>({
+        title: "",
+        subTitle: "",
+        severity: "info",
+    })
     const styles = CardStyles(theme);
     const navigate = useNavigate();
     const { setReport } = useAppStore();
     const { loader, showLoader, hideLoader } = useLoader();
+    const { showToggle, toggleSnackBar } = useToggleSnackBar();
+
 
     const GenerateQuestionsMutation = useMutation({
         mutationKey: ['GenerateQuestionsMutation'],
         mutationFn: (payload: IGenerateQuestionsPayload) => GenerateQuestions(payload),
         onSuccess: (data) => {
             hideLoader();
+            setIndexCalled(-1);
             if (data?.success) {
                 setReport(data.output);
                 navigate("/questions");
             }
         },
-        onError: (err) => {
+        onError: () => {
+            setSnackBar({ title: "Error", subTitle: "Something went wrong ....", severity: "error" });
             hideLoader();
-            console.log(err)
+            setIndexCalled(-1);
+            toggleSnackBar();
         }
     })
 
     const callGenerateQuestionsAPI = async (index: number) => {
+        setIndexCalled(index);
         showLoader();
         const payload: string = JSON.stringify(resumeInfo[index]);
         await GenerateQuestionsMutation.mutateAsync({ report: payload });
@@ -169,9 +186,14 @@ const AppCard = ({ resumeInfo }: ICard) => {
                                 </Box>
 
                                 <Box sx={styles.button}>
-                                    <AppButton onClick={() => callGenerateQuestionsAPI(index)} text="Generate Questionnaires" isLoading={loader} loadingText="Generating" />
+                                    <AppButton onClick={() => callGenerateQuestionsAPI(index)} text="Generate Questionnaires" isLoading={Boolean(indexCalled === index && loader)} loadingText="Generating" />
                                 </Box>
                             </Box>
+                            {
+                                Boolean(showToggle) && <AppAlert isOpen={showToggle} handleClose={toggleSnackBar} title={snackBar.title} subTitle=
+                                    {snackBar.subTitle} severity={snackBar.severity} />
+
+                            }
                         </Box>
                     )
                 })
@@ -194,6 +216,27 @@ const ColBox = ({ required, candidate }: IColBox) => {
 
 
 const ContentTable = ({ required, candidate }: ITables) => {
+    const [arr, setArr] = React.useState<number[]>([]);
+    const sizeArray: number[] = [];
+    const sizeOfArray = required.length >= candidate.length ? required.length : candidate.length;
+
+    const calculateSizeArray = () => {
+        if (sizeArray.length) {
+            return false
+        } else {
+            for (let i = 0; i < sizeOfArray; i++) {
+                sizeArray.push(i);
+            }
+            return true;
+        }
+    }
+
+    React.useEffect(() => {
+        if (calculateSizeArray()) {
+            setArr(sizeArray);
+        }
+    }, [sizeOfArray])
+
     return (
         <Table sx={{ padding: 0 }}>
             <TableHead sx={{ backgroundColor: "grey" }}>
@@ -210,13 +253,13 @@ const ContentTable = ({ required, candidate }: ITables) => {
             </TableHead>
             <TableBody>
                 {
-                    required.map((item, index) => {
+                    (arr || []).map((item, index) => {
                         return <TableRow key={index}>
-                            <TableCell>
-                                {item}
+                            <TableCell sx={{ verticalAlign: "top" }}>
+                                {required[item] ?? null}
                             </TableCell>
-                            <TableCell>
-                                {candidate[index]}
+                            <TableCell sx={{ verticalAlign: "top" }}>
+                                {candidate[item] ?? null}
                             </TableCell>
                         </TableRow>
                     })

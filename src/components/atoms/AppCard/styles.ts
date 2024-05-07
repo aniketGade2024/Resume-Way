@@ -3,7 +3,7 @@ import { Theme } from "@mui/material";
 
 const CardStyles = (theme: Theme) => ({
     box: {
-        width: window.innerWidth * 0.25,
+        minWidth: window.innerWidth * 0.25,
         backgroundColor: theme.palette.info.main,
         padding: "20px",
         marginBottom: "20px",

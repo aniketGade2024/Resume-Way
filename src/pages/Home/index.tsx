@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { AppAlert, AppButton, FileUploader } from "@/components/atoms";
-import { AlertProps, Box, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material";
 import HomePageStyles from "./styles";
 import { FormProvider, useForm } from "react-hook-form";
 import React from "react";
@@ -18,6 +18,7 @@ import useAppStore from "@/store";
 import { useNavigate } from "react-router-dom";
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import { ISnackBar } from "@/types/common";
 
 type IAnalyze = {
     resume?: string;
@@ -25,11 +26,6 @@ type IAnalyze = {
 }
 
 
-type ISnackBar = {
-    title: "Success" | "Error" | "Warning" | "Info" | "";
-    subTitle: string;
-    severity: AlertProps["severity"]
-}
 
 const Home = () => {
     const [convertedJson, setConvertedJson] = React.useState<IAnalyze>({
