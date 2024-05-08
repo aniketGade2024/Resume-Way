@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { AppAlert, AppButton, FileUploader } from "@/components/atoms";
-import { Box, Typography } from "@mui/material";
+import { Box, TextField, Typography } from "@mui/material";
 import HomePageStyles from "./styles";
 import { FormProvider, useForm } from "react-hook-form";
 import React from "react";
@@ -40,6 +40,7 @@ const Home = () => {
 
     const [loadingText, setLoadingText] = React.useState<"resume" | "jd" | "process" | undefined>();
     const [isUploading, setIsUploading] = React.useState<boolean>(false);
+    const [score, setScore] = React.useState<number>(0);
 
     const [snackBar, setSnackBar] = React.useState<ISnackBar>({
         title: "",
@@ -49,13 +50,19 @@ const Home = () => {
 
     const styles = HomePageStyles();
     const { loader, showLoader, hideLoader } = useLoader();
-    const { setResumeInfo, acceptedResumeScore, setAcceptedResumeScore } = useAppStore();
+    const { setResumeInfo, setAcceptedResumeScore } = useAppStore();
     const navigate = useNavigate();
     const { showToggle, toggleSnackBar } = useToggleSnackBar();
 
     const FileUploaderSchema = z.object({
         resume: z.string().min(1, 'Resume File is Required'),
-        jd: z.string().min(1, 'jd file is required')
+        jd: z.string().min(1, 'jd file is required'),
+        resumeScore: z.number().refine((value) => {
+            if (value < -1 || value > 100) {
+                return false
+            }
+            return true;
+        }, "Please Enter correct input")
     })
     type IValidation = z.infer<typeof FileUploaderSchema>;
 
@@ -63,17 +70,18 @@ const Home = () => {
         resolver: zodResolver(FileUploaderSchema),
         defaultValues: {
             resume: '',
-            jd: ''
+            jd: '',
+            resumeScore: 0,
         }
     });
 
-    const { watch, reset } = methods;
+    const { watch, reset, handleSubmit, formState: { errors } } = methods;
 
     const setResumeScore = (type: "increment" | "decrement") => {
         if (type === "increment") {
-            setAcceptedResumeScore(acceptedResumeScore + 1);
+            setScore(score + 1);
         } else {
-            setAcceptedResumeScore(acceptedResumeScore - 1);
+            setScore(score - 1);
         }
     }
 
@@ -85,7 +93,6 @@ const Home = () => {
             hideLoader();
         },
         onError: () => {
-            console.log("Error =>");
             setIsUploading(false);
             setSnackBar({ title: "Error", subTitle: "Something went wrong ....", severity: "error" });
             hideLoader();
@@ -98,17 +105,20 @@ const Home = () => {
     const ExtractResumeJsonMutation = useMutation({
         mutationKey: ['ExtractResumeJsonMutation'],
         mutationFn: (payload: IExtractJsonPayload) => ExtractResumeJson(payload),
-        onSuccess: (data) => {
-            setConvertedJson({
-                ...convertedJson, resume: JSON.stringify((data as any)?.output)
-            });
-            setSnackBar({ title: 'Success', subTitle: "JSON Extracted Successfully!", severity: "success" })
+        onSuccess: (data: any) => {
+            if (data.error) {
+                setSnackBar({ title: 'Error', subTitle: "Operation Failed", severity: "error" });
+            } else {
+                setConvertedJson({
+                    ...convertedJson, resume: JSON.stringify(data?.output)
+                });
+                setSnackBar({ title: 'Success', subTitle: "JSON Extracted Successfully!", severity: "success" })
+            }
             setLoadingText(undefined);
             hideLoader();
             toggleSnackBar();
         },
         onError: () => {
-            setSnackBar({ title: 'Error', subTitle: "Operation Failed", severity: "error" });
             hideLoader();
             toggleSnackBar();
         }
@@ -118,11 +128,16 @@ const Home = () => {
     const ExtractJDJsonMutation = useMutation({
         mutationKey: ['ExtractResumeJsonMutation'],
         mutationFn: (payload: IExtractJsonPayload) => ExtractJDJson(payload),
-        onSuccess: (data) => {
-            setConvertedJson({
-                ...convertedJson, job_description: JSON.stringify((data as any)?.output)
-            });
-            setSnackBar({ title: 'Success', subTitle: "JSON Extracted Successfully!", severity: "success" })
+        onSuccess: (data: any) => {
+            if (data.error) {
+                setSnackBar({ title: 'Error', subTitle: "Operation Failed", severity: "error" });
+
+            } else {
+                setConvertedJson({
+                    ...convertedJson, job_description: JSON.stringify((data as any)?.output)
+                });
+                setSnackBar({ title: 'Success', subTitle: "JSON Extracted Successfully!", severity: "success" })
+            }
             setLoadingText(undefined);
             hideLoader();
             toggleSnackBar();
@@ -142,7 +157,7 @@ const Home = () => {
             if (data) {
                 setResumeInfo(data.output);
             }
-            navigate({ pathname: "/user" })
+            navigate({ pathname: "/profiles" })
             hideLoader();
         },
         onError: () => {
@@ -190,6 +205,7 @@ const Home = () => {
     const callAnalyzeAPI = async () => {
         showLoader();
         setLoadingText("process");
+        setAcceptedResumeScore(score);
         const payload: IAnalyzePayload = {
             resume: convertedJson.resume as string,
             job_description: convertedJson.job_description as string
@@ -211,10 +227,14 @@ const Home = () => {
         }
     }, [watch('jd')]);
 
+    React.useEffect(() => {
+        console.log(errors)
+    }, [errors])
+
     return (
         <Box sx={styles.card}>
-            <Box sx={styles.dFlex}>
-                <FormProvider {...methods}>
+            <FormProvider {...methods}>
+                <Box sx={styles.dFlex}>
                     <Box sx={styles.flex1}>
                         <FileUploader name="resume" title="Upload Resume" isUploading={Boolean(isUploading && watch("resume") && !prompt.resume)} />
                         <AppButton disabled={Boolean(prompt.resume === '')} text={convertedJson.resume ? "Extracted" : "Extract JSON"} onClick={convertedJson.resume ? () => { } : () => callExtractJSON('resume', prompt.resume ?? '')} isSuccess={convertedJson.resume !== ""} isLoading={Boolean(loader && loadingText === "resume")} loadingText="Extracting" />
@@ -223,32 +243,33 @@ const Home = () => {
                     <Box sx={styles.flex1}>
                         <FileUploader name="jd" title="Upload JD (Job Description)" isUploading={Boolean(isUploading && watch("jd") && !prompt.job_description)} />
                         <Box sx={styles.justifyEnd}>
-                            <AppButton disabled={Boolean(prompt.job_description === '' || !convertedJson.resume)} text={convertedJson.job_description ? "Extracted" : "Extract JSON"} onClick={convertedJson.job_description ? () => { } : () => callExtractJSON('jd', prompt.job_description ?? '')} isSuccess={convertedJson.job_description !== ""} isLoading={Boolean(loader && loadingText === "jd")} loadingText="Extracting" />
+                            <AppButton disabled={Boolean(prompt.job_description === '')} text={convertedJson.job_description ? "Extracted" : "Extract JSON"} onClick={convertedJson.job_description ? () => { } : () => callExtractJSON('jd', prompt.job_description ?? '')} isSuccess={convertedJson.job_description !== ""} isLoading={Boolean(loader && loadingText === "jd")} loadingText="Extracting" />
                         </Box>
                     </Box>
-                </FormProvider>
-            </Box>
-            <Box sx={{ ...styles.flex, gap: "10px", justifyContent: "center" }}>
-                <Typography sx={styles.score}>Accepted Resume Score :</Typography>
-                <Box sx={styles.flex}>
-                    <Typography component={"span"} sx={styles.span}>
-                        {acceptedResumeScore}%
-                    </Typography>
-                    <Box sx={styles.colFlex}>
-                        <ArrowUpwardIcon color={acceptedResumeScore < 100 ? "success" : "info"} sx={{ cursor: acceptedResumeScore < 100 ? "pointer" : "default" }} onClick={acceptedResumeScore < 100 ? () => setResumeScore("increment") : () => { }} />
-                        <ArrowDownwardIcon color={acceptedResumeScore > 0 ? "error" : "info"} sx={{ cursor: acceptedResumeScore > 0 ? "pointer" : "default" }} onClick={acceptedResumeScore > 0 ? () => setResumeScore("decrement") : () => { }} />
+                </Box>
+                <Box sx={{ ...styles.flex, gap: "10px", justifyContent: "center" }}>
+                    <Typography sx={styles.score}>Accepted Resume Score :</Typography>
+                    <Box sx={styles.flex}>
+                        <Typography component={"span"} sx={styles.span}>
+                            <TextField name="resumeScore" sx={styles.input} value={score} onChange={(e) => setScore(Number(e.target.value))} />
+                        </Typography>
+                        <Box sx={styles.colFlex}>
+                            <ArrowUpwardIcon color={score < 100 ? "success" : "info"} sx={{ cursor: score < 100 ? "pointer" : "default" }} onClick={score < 100 ? () => setResumeScore("increment") : () => { }} />
+                            <ArrowDownwardIcon color={score > 0 ? "error" : "info"} sx={{ cursor: score > 0 ? "pointer" : "default" }} onClick={score > 0 ? () => setResumeScore("decrement") : () => { }} />
+                        </Box>
                     </Box>
                 </Box>
-            </Box>
 
-            <Box sx={styles.justifyCenter}>
-                <AppButton text="Process" onClick={() => callAnalyzeAPI()} sx={styles.processBtn} disabled={Boolean(!convertedJson.resume && !convertedJson.job_description)} isLoading={Boolean(loader && loadingText === "process")} loadingText="Processing" />
-            </Box>
-            {
-                Boolean(showToggle) && <AppAlert isOpen={showToggle} handleClose={toggleSnackBar} title={snackBar.title} subTitle=
-                    {snackBar.subTitle} severity={snackBar.severity} />
+                <Box sx={styles.justifyCenter}>
+                    <AppButton text="Process" onClick={handleSubmit(callAnalyzeAPI)} sx={styles.processBtn} disabled={Boolean(!convertedJson.resume || !convertedJson.job_description)} isLoading={Boolean(loader && loadingText === "process")} loadingText="Processing" />
+                </Box>
+                {
+                    Boolean(showToggle) && <AppAlert isOpen={showToggle} handleClose={toggleSnackBar} title={snackBar.title} subTitle=
+                        {snackBar.subTitle} severity={snackBar.severity} />
 
-            }
+                }
+            </FormProvider>
+
         </Box>
     )
 }

@@ -68,7 +68,7 @@ const CardStyles = (theme: Theme) => ({
         fontSize:"14px"
     },
     badge: {
-        width: "46px", height: "46px",
+        width: "60px", height: "60px",
         padding: "5px",
         borderRadius: "50%",
         display: "flex",

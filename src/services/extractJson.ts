@@ -8,7 +8,11 @@ const ExtractResumeJson = async (payload: IExtractJsonPayload) => {
         const response = await apiInstance.post(apiURLs.extractResumeJson, payload);
         const processedResponse = await response.data;
         return processedResponse;
-    } catch { }
+    } catch {
+        return {
+            success: false, error: true
+        }
+    }
 
 }
 
@@ -18,7 +22,11 @@ const ExtractJDJson = async (payload: IExtractJsonPayload) => {
         const response = await apiInstance.post(apiURLs.extractJdJson, payload);
         const processedResponse = await response.data;
         return processedResponse;
-    } catch { }
+    } catch {
+        return {
+            success: false, error: true
+        }
+    }
 
 }
 

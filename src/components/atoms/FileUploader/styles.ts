@@ -68,6 +68,7 @@ const FileUploaderStyles = (theme: Theme) => ({
             color: theme.palette.secondary.main,
             border: "none",
             outline: "1px solid #010101",
+            cursor:"pointer"
         },
     },
 

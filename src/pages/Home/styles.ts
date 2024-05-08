@@ -44,6 +44,9 @@ const HomePageStyles = () => ({
     },
     colFlex: {
         display: "flex", flexDirection: "column", gap: "5px"
+    },
+    input:{
+        width:"60px",
     }
 })
 
