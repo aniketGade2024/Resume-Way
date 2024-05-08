@@ -76,12 +76,14 @@ const AppCard = ({ resumeInfo }: ICard) => {
         onSuccess: (data) => {
             hideLoader();
             setIndexCalled(-1);
+            console.log(data);
             if (data?.success) {
                 setReport(data.output);
                 navigate("/questions");
             }
         },
         onError: () => {
+            console.log("error");
             setSnackBar({ title: "Error", subTitle: "Something went wrong ....", severity: "error" });
             hideLoader();
             setIndexCalled(-1);

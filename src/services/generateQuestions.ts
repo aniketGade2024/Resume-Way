@@ -8,6 +8,7 @@ export default async function GenerateQuestions(payload: IGenerateQuestionsPaylo
     try {
         const response = await apiInstance.post(apiURLs.generateQuestions, payload);
         const processedResponse = await response.data;
+        console.log(processedResponse);
         return GenerateQuestionResponseSchema.parse(processedResponse);
     } catch {
         return GenerateQuestionResponseSchema.parse({})

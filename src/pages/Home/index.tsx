@@ -40,7 +40,6 @@ const Home = () => {
 
     const [loadingText, setLoadingText] = React.useState<"resume" | "jd" | "process" | undefined>();
     const [isUploading, setIsUploading] = React.useState<boolean>(false);
-    const [score, setScore] = React.useState<number>(0);
 
     const [snackBar, setSnackBar] = React.useState<ISnackBar>({
         title: "",
@@ -50,9 +49,11 @@ const Home = () => {
 
     const styles = HomePageStyles();
     const { loader, showLoader, hideLoader } = useLoader();
-    const { setResumeInfo, setAcceptedResumeScore } = useAppStore();
+    const { setResumeInfo, setAcceptedResumeScore, acceptedResumeScore } = useAppStore();
     const navigate = useNavigate();
     const { showToggle, toggleSnackBar } = useToggleSnackBar();
+    const [score, setScore] = React.useState<number>(acceptedResumeScore);
+
 
     const FileUploaderSchema = z.object({
         resume: z.string().min(1, 'Resume File is Required'),
