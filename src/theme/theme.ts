@@ -9,16 +9,16 @@ const theme = createTheme({
       main: '#005af0',
     },
     error:{
-      main:'#FF3333'
+      main:'#FF2828'
     },
     warning:{
-      main:'#FFC100'
+      main:'#FF8934'
     },
     info:{
       main:"#fff"
     },
     success:{
-      main:"#22bb33"
+      main:"#22C55E"
     }
   },
 });

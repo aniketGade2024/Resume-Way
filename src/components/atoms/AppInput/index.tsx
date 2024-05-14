@@ -50,14 +50,12 @@ const AppInput = ({
               variant={variant ?? "outlined"}
               sx={styles.input}
               InputProps={{
-                startAdornment:(
-                  type === "search" && (
-                    <InputAdornment position="start">
-                      <IconButton edge="start" disableRipple color="primary">
-                        <SearchRounded sx={styles.icon}/>
-                      </IconButton>
-                    </InputAdornment>
-                  )
+                startAdornment: type === "search" && (
+                  <InputAdornment position="start">
+                    <IconButton edge="start" disableRipple color="primary">
+                      <SearchRounded sx={styles.icon} />
+                    </IconButton>
+                  </InputAdornment>
                 ),
                 endAdornment: type === "password" && (
                   <InputAdornment position="end">
@@ -66,7 +64,11 @@ const AppInput = ({
                       edge="end"
                       disableRipple
                     >
-                      {showPassword ? <VisibilityOff sx={styles.icon} /> : <Visibility sx={styles.icon} />}
+                      {showPassword ? (
+                        <VisibilityOff sx={styles.icon} />
+                      ) : (
+                        <Visibility sx={styles.icon} />
+                      )}
                     </IconButton>
                   </InputAdornment>
                 ),

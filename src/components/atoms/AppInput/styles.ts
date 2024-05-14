@@ -14,6 +14,7 @@ const AppInputStyles = () =>
         transition: "none !important",
         borderRadius: "8px",
         background: theme.palette.info.main,
+        minHeight:"40px"
       },
     },
     label: {

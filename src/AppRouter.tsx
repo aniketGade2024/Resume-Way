@@ -1,6 +1,6 @@
 import React, { ComponentType } from 'react'
 import { Route, Routes } from 'react-router-dom'
-import { AuthPage, CreateJD, Home, Questionnaires, UserInfo } from './pages'
+import { ApplicationListing, AuthPage, CreateJD, Home, Questionnaires, UserInfo } from './pages'
 import JDListing from './pages/JDListing'
 
 type IRoutes = {
@@ -35,6 +35,10 @@ export const routes: IRoutes[] = [
     {
         path:'/createjd',
         component:CreateJD
+    },
+    {
+        path:'/applications',
+        component:ApplicationListing
     }
 ]
 

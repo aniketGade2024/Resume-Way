@@ -2,6 +2,7 @@ import { Menu, MenuProps, alpha, styled } from "@mui/material";
 
 const AppMenu = styled((props: MenuProps) => (
   <Menu
+  id={props.id}
     elevation={0}
     anchorOrigin={{
       vertical: "bottom",
@@ -29,7 +30,7 @@ const AppMenu = styled((props: MenuProps) => (
     },
     "& .MuiMenuItem-root": {
       "& .MuiSvgIcon-root": {
-        fontSize: 18,
+        fontSize: 25,
         color: theme.palette.text.secondary,
         marginRight: theme.spacing(1.5),
       },

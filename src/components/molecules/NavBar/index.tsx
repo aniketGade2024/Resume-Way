@@ -15,6 +15,7 @@ enum routes {
   questions = "/questions",
   list = "/list",
   createjd = "/createjd",
+  applications = "/applications",
 }
 type IRouteType = {
   [key in routes]: string;
@@ -26,6 +27,7 @@ const headerTiles: IRouteType = {
   "/questions": "Questionnaire",
   "/list": "Listing of JD's",
   "/createjd": "Create Job Description",
+  "/applications": "List of Applications",
 };
 
 const NavBar = () => {
@@ -64,6 +66,7 @@ const NavBar = () => {
               | "/questions"
               | "/createjd"
               | "/list"
+              | "/applications"
           ]
         }
         {/* <img src={AnimatedPlane} alt="Animated Plane" /> */}
