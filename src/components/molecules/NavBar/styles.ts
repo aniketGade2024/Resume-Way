@@ -2,35 +2,35 @@ import { Theme } from "@mui/material";
 
 const NavBarStyles = (scrollY: number, theme: Theme) => ({
   topNav: {
-    position: "sticky",
-    top: "0",
     transition: "all 0.2s ease-in-out",
     zIndex: 100,
     overflow: "hidden",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: "0px 60px",
-    backgroundColor: scrollY > 40 ? theme.palette.info.main : "transparent",
+    padding: "20px 60px",
+    backgroundColor: theme.palette.info.main,
     a: {
-      color: scrollY > 40 ? "#000" : theme.palette.info.main,
+      color: "#000",
       textAlign: "center",
       padding: "10px 16px",
       textDecoration: "none",
       fontSize: "15px",
     },
-    boxShadow: scrollY > 40 ? "0px 10px 10px -10px rgba(0, 0, 0, 0.8);" : "none"
+    boxShadow: "0px 10px 10px -10px rgba(0, 0, 0, 0.8)",
   },
   topNavLeft: {
+    flex:1,
     display: "flex",
     alignItems: "center",
-    color: scrollY > 40 ? "#000" : theme.palette.info.main,
+    justifyContent: "space-between",
+    color: "#000",
     fontSize: "20px",
     img: {
-      transition:"all 0.2s ease-in-out",
-      height: scrollY > 40 ? "70px" : "100px",
+      transition: "all 0.2s ease-in-out",
+      height: "70px",
     },
   },
-})
+});
 
 export default NavBarStyles;

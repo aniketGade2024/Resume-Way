@@ -17,16 +17,37 @@ const HomePageStyles = () => ({
     },
 
     span: {
-        fontSize: "16px",
+        fontSize: "18px",
         fontWeight: "bolder",
     },
 
     justifyEnd: {
         display: "flex",
         justifyContent: "flex-end",
-        paddingRight: "30px",
     },
 
+    flex1: {
+        flex: 1,
+        margin: "20px 40px",
+    },
+
+    justifyCenter: {
+        display: "flex",
+        justifyContent: "center"
+    },
+    processBtn: {
+        marginTop: "5%"
+    },
+    flex: {
+        display: "flex",
+        alignItems: "center"
+    },
+    colFlex: {
+        display: "flex", flexDirection: "column", gap: "5px"
+    },
+    input:{
+        width:"60px",
+    }
 })
 
 export default HomePageStyles;
