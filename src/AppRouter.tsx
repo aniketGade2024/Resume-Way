@@ -1,6 +1,7 @@
 import React, { ComponentType } from 'react'
 import { Route, Routes } from 'react-router-dom'
-import { Home, Questionnaires, UserInfo } from './pages'
+import { AuthPage, CreateJD, Home, Questionnaires, UserInfo } from './pages'
+import JDListing from './pages/JDListing'
 
 type IRoutes = {
     path: string,
@@ -12,8 +13,12 @@ type IRoutes = {
 export const routes: IRoutes[] = [
     {
         path: '/',
-        component: Home,
+        component: AuthPage,
         index: true
+    },
+    {
+        path: "/home",
+        component: Home
     },
     {
         path: '/profiles',
@@ -22,6 +27,14 @@ export const routes: IRoutes[] = [
     {
         path: "/questions",
         component: Questionnaires
+    },
+    {
+        path:'/list',
+        component:JDListing
+    },
+    {
+        path:'/createjd',
+        component:CreateJD
     }
 ]
 
@@ -32,7 +45,7 @@ const AppRouter = () => {
             {
                 routes.map((item, index) => {
                     return (
-                        <Route key={index} path={item.path} Component={item.component} index={item?.index ? true : false}  />
+                        <Route key={index} path={item.path} Component={item.component} index={item?.index ? true : false} />
                     )
                 })
             }

@@ -36,3 +36,12 @@ export const calculatePercentage = (jobSkills: string[], candidateSkills: string
     )
 
 }
+
+
+export const checkHiddenRoute = (path: string) => {
+    const HiddenRoutes = ["/"];
+    if (HiddenRoutes.includes(path)) {
+        return true
+    }
+    return false;
+}

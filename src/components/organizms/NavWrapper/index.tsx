@@ -3,12 +3,14 @@ import { Box } from "@mui/material";
 
 type INavWrapper = {
     children: React.ReactNode;
+    isHide?: boolean;
 }
 
-const NavWrapper = ({ children }: INavWrapper) => {
+const NavWrapper = ({ children, isHide }: INavWrapper) => {
     return (
         <Box>
-            <NavBar />
+            {Boolean(!isHide) && <NavBar />
+            }
             {children}
         </Box>
 
