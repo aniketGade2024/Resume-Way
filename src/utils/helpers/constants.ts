@@ -1,14 +1,14 @@
 export const AppConstants = {
   USER_EMAIL: import.meta.env.USER_EMAIL ?? "resumeway2024@bluebenz.com",
   USER_PASSWORD: import.meta.env.USER_PASSWORD ?? "resumeway2024",
-  JD_DATA : [
+  JD_DATA: [
     {
       title: "Software Engineer",
       openPositions: 5,
       experience: "2-5 years",
       profileLocation: "New York, NY",
       updatedDate: "2024-05-14",
-      status: "Active"
+      status: "Active",
     },
     {
       title: "Web Developer",
@@ -16,7 +16,7 @@ export const AppConstants = {
       experience: "1-3 years",
       profileLocation: "San Francisco, CA",
       updatedDate: "2024-05-13",
-      status: "Active"
+      status: "Active",
     },
     {
       title: "Frontend Developer",
@@ -24,7 +24,7 @@ export const AppConstants = {
       experience: "3-5 years",
       profileLocation: "London, UK",
       updatedDate: "2024-05-12",
-      status: "Inactive"
+      status: "Inactive",
     },
     {
       title: "Full Stack Developer",
@@ -32,7 +32,7 @@ export const AppConstants = {
       experience: "2-4 years",
       profileLocation: "Berlin, Germany",
       updatedDate: "2024-05-14",
-      status: "Active"
+      status: "Active",
     },
     {
       title: "iOS Developer",
@@ -40,7 +40,7 @@ export const AppConstants = {
       experience: "5+ years",
       profileLocation: "Tokyo, Japan",
       updatedDate: "2024-05-10",
-      status: "Active"
+      status: "Active",
     },
     {
       title: "Backend Developer",
@@ -48,7 +48,7 @@ export const AppConstants = {
       experience: "3-6 years",
       profileLocation: "Toronto, Canada",
       updatedDate: "2024-05-11",
-      status: "Active"
+      status: "Active",
     },
     {
       title: "UI/UX Designer",
@@ -56,7 +56,7 @@ export const AppConstants = {
       experience: "2-4 years",
       profileLocation: "Paris, France",
       updatedDate: "2024-05-12",
-      status: "Inactive"
+      status: "Inactive",
     },
     {
       title: "Data Scientist",
@@ -64,7 +64,7 @@ export const AppConstants = {
       experience: "4-7 years",
       profileLocation: "Sydney, Australia",
       updatedDate: "2024-05-14",
-      status: "Active"
+      status: "Active",
     },
     {
       title: "Machine Learning Engineer",
@@ -72,7 +72,7 @@ export const AppConstants = {
       experience: "3-5 years",
       profileLocation: "Seoul, South Korea",
       updatedDate: "2024-05-13",
-      status: "Active"
+      status: "Active",
     },
     {
       title: "DevOps Engineer",
@@ -80,8 +80,79 @@ export const AppConstants = {
       experience: "3-6 years",
       profileLocation: "Amsterdam, Netherlands",
       updatedDate: "2024-05-14",
-      status: "Inactive"
-    }
-  ]
-  
+      status: "Inactive",
+    },
+  ],
+  APPLICATIONS: [
+    {
+      name: "John Doe",
+      skill: "Python",
+      experience: "1-2 years",
+      location: "New York, San Francisco",
+      score: 87,
+    },
+    {
+      name: "Jane Smith",
+      skill: "JavaScript",
+      experience: "3-4 years",
+      location: "Seattle, Boston",
+      score: 32,
+    },
+    {
+      name: "Michael Johnson",
+      skill: "Java",
+      experience: "5-6 years",
+      location: "Chicago, Los Angeles",
+      score: 78,
+    },
+    {
+      name: "Emily Brown",
+      skill: "C++",
+      experience: "7-8 years",
+      location: "San Francisco, Dallas",
+      score: 50,
+    },
+    {
+      name: "David Wilson",
+      skill: "Ruby",
+      experience: "1-2 years",
+      location: "Boston, Atlanta",
+      score: 75,
+    },
+    {
+      name: "Sarah Taylor",
+      skill: "C#",
+      experience: "3-4 years",
+      location: "Los Angeles, Seattle",
+      score: 88,
+    },
+    {
+      name: "Chris Martinez",
+      skill: "PHP",
+      experience: "5-6 years",
+      location: "Chicago, New York",
+      score: 20,
+    },
+    {
+      name: "Amanda Lee",
+      skill: "Swift",
+      experience: "7-8 years",
+      location: "San Francisco, Boston",
+      score: 90,
+    },
+    {
+      name: "Daniel Clark",
+      skill: "SQL",
+      experience: "1-2 years",
+      location: "Seattle, Chicago",
+      score: 63,
+    },
+    {
+      name: "Olivia Garcia",
+      skill: "R",
+      experience: "3-4 years",
+      location: "Boston, Dallas",
+      score: 50,
+    },
+  ],
 };

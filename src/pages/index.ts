@@ -3,3 +3,4 @@ export { default as UserInfo } from "./UserInfo";
 export { default as Questionnaires } from "./Questionnaire";
 export { default as AuthPage } from "./Login";
 export { default as CreateJD } from "./CreateJD";
+export { default as ApplicationListing } from "./ApplicationsListing";
